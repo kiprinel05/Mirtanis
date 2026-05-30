@@ -1,53 +1,57 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
-import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
+import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-story-section',
   standalone: true,
-  imports: [CommonModule, RevealDirective, ParallaxDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, RevealDirective],
   template: `
-    <section class="section relative overflow-hidden">
-      <div class="absolute -top-40 -left-40 w-[480px] h-[480px] bg-gold-400/10 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 right-0 w-[520px] h-[520px] bg-lake-400/10 rounded-full blur-3xl"></div>
-
-      <div class="container-luxe grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-        <div>
-          <span appReveal class="eyebrow">Povestea noastră</span>
-          <h2 appReveal [revealDelay]="100" class="mt-5 font-display text-4xl md:text-6xl text-white leading-tight">
-            Un <span class="gold-text">tărâm pe apă</span>, creat pentru momentele care contează.
-          </h2>
-          <div appReveal [revealDelay]="200" class="divider-gold w-24 mt-8"></div>
-          <p appReveal [revealDelay]="300" class="mt-8 text-white/75 text-lg leading-relaxed max-w-xl">
-            Întregul complex Mirtanis este așezat în mijlocul unui lac liniștit, înconjurat
-            de poduri elegante, alei iluminate și pontoane premium. Cortul nostru de evenimente
-            și sala interioară rafinată sunt gândite ca să transforme orice ceremonie într-o
-            experiență cinematică.
-          </p>
-          <blockquote appReveal [revealDelay]="400" class="mt-10 font-display italic text-2xl md:text-3xl text-gold-200 border-l-2 border-gold-400/60 pl-6">
-            „Locație de poveste, un lac superb, mirific. Un loc de neuitat.”
-          </blockquote>
-          <p appReveal [revealDelay]="500" class="mt-3 text-white/50 text-sm">— recenzii reale ale invitaților noștri</p>
+    <section class="section bg-cream-fade">
+      <div class="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+        <!-- Images -->
+        <div class="relative" appReveal="left">
+          <div class="img-cine gold-frame hover-lift aspect-[4/5] rounded-3xl shadow-card">
+            <img [src]="main" alt="Decor elegant la Mirtanis Events" loading="lazy" />
+          </div>
+          <div class="img-cine anim-float absolute -bottom-10 -right-4 hidden aspect-square w-44 rounded-2xl border-4 border-cream-50 shadow-lift sm:block lg:w-56">
+            <img [src]="detail" alt="Buchet de mireasă" loading="lazy" />
+          </div>
         </div>
 
-        <div class="relative h-[560px] md:h-[640px]">
-          <div appParallax [parallaxFactor]="0.06" class="absolute top-0 right-0 w-2/3 h-2/3 img-cine shadow-glass">
-            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80"
-                 alt="Cort premium pe lac" loading="lazy" class="w-full h-full object-cover" />
-          </div>
-          <div appParallax [parallaxFactor]="-0.04" class="absolute bottom-0 left-0 w-3/5 h-3/5 img-cine shadow-glass border border-gold-400/30">
-            <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80"
-                 alt="Pontoane peste lac" loading="lazy" class="w-full h-full object-cover" />
-          </div>
-          <div class="absolute -bottom-6 right-1/3 glass rounded-2xl px-6 py-5 shadow-glow-gold">
-            <p class="font-display italic text-2xl text-white">4.5<span class="text-gold-300">/5</span></p>
-            <p class="text-xs text-white/60 mt-1 tracking-widest uppercase">Google Reviews</p>
-          </div>
+        <!-- Text -->
+        <div appReveal="right">
+          <p class="eyebrow">Povestea noastră</p>
+          <h2 class="mt-4 font-display text-4xl text-ink-900 sm:text-5xl">
+            Un loc gândit pentru <span class="gold-text">momentele care contează</span>
+          </h2>
+          <p class="mt-6 text-lg leading-relaxed text-ink-600">
+            La Mirtanis Events, fiecare detaliu este atins de lumina caldă a apusului peste lac.
+            De la cortul premium cu vedere panoramică până la sala interioară elegantă,
+            am creat un cadru în care emoția curge firesc, iar invitații se simt acasă.
+          </p>
+          <ul class="mt-8 space-y-4" appReveal="up" [revealStagger]="90" [revealDelay]="150">
+            @for (f of features; track f) {
+              <li class="flex items-start gap-3">
+                <span class="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gold-100 text-gold-600">✦</span>
+                <span class="text-ink-700">{{ f }}</span>
+              </li>
+            }
+          </ul>
+          <a routerLink="/locatii" class="btn btn-outline mt-10">Vezi locațiile</a>
         </div>
       </div>
     </section>
   `
 })
-export class StorySectionComponent {}
+export class StorySectionComponent {
+  readonly main = IMAGES.storyTable;
+  readonly detail = IMAGES.storyDetails;
+  readonly features = [
+    'Priveliște deschisă către lac, perfectă pentru ceremonii în aer liber',
+    'Cort premium și sală interioară, pentru orice anotimp',
+    'Echipă dedicată care coordonează fiecare detaliu',
+    'Spațiu generos de parcare și acces facil pentru invitați'
+  ];
+}

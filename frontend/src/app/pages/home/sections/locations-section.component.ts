@@ -1,93 +1,60 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
-
-interface Venue {
-  tag: string;
-  title: string;
-  subtitle: string;
-  desc: string;
-  image: string;
-  capacity: string;
-  features: string[];
-}
+import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-locations-section',
   standalone: true,
-  imports: [CommonModule, RouterLink, RevealDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, RevealDirective],
   template: `
-    <section class="section relative" id="locatii">
-      <div class="container-luxe">
-        <div class="max-w-3xl">
-          <span appReveal class="eyebrow">Cele două locații</span>
-          <h2 appReveal [revealDelay]="100" class="mt-5 font-display text-4xl md:text-6xl text-white leading-[1.05]">
-            Două spații, <span class="gold-text">o singură poveste</span>.
-          </h2>
-          <p appReveal [revealDelay]="200" class="mt-6 text-white/70 text-lg leading-relaxed">
-            Indiferent de anotimp, indiferent de stil — alegi cortul premium cu vedere panoramică
-            spre apă sau sala interioară elegantă, calmă și rafinată.
+    <section class="section">
+      <div class="container-x">
+        <div class="mx-auto max-w-2xl text-center" appReveal="up">
+          <p class="eyebrow both">Locațiile noastre</p>
+          <h2 class="mt-4 font-display text-4xl text-ink-900 sm:text-5xl">Două decoruri, o singură poveste</h2>
+          <p class="mt-5 text-ink-600">
+            Alege cadrul potrivit pentru ziua ta — sub cerul liber, lângă apă, sau în eleganța caldă a sălii interioare.
           </p>
         </div>
 
-        <div class="mt-16 grid lg:grid-cols-2 gap-8">
-          <article *ngFor="let v of venues; let i = index" appReveal [revealDelay]="i * 150"
-                   class="group relative overflow-hidden rounded-3xl glass-dark border border-white/5 hover:border-gold-400/40 transition-all duration-700">
-            <div class="relative h-[420px] overflow-hidden">
-              <img [src]="v.image" [alt]="v.title" loading="lazy"
-                   class="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-110 saturate-[0.95] group-hover:saturate-110" />
-              <div class="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent"></div>
-              <span class="absolute top-5 left-5 eyebrow bg-ink-950/60 backdrop-blur px-3 py-1.5 rounded-full">{{ v.tag }}</span>
-            </div>
-
-            <div class="p-8 md:p-10">
-              <h3 class="font-display text-3xl md:text-4xl text-white">{{ v.title }}</h3>
-              <p class="mt-2 text-gold-300 italic font-display text-xl">{{ v.subtitle }}</p>
-              <p class="mt-5 text-white/70 leading-relaxed">{{ v.desc }}</p>
-
-              <ul class="mt-6 flex flex-wrap gap-2">
-                <li *ngFor="let f of v.features" class="text-xs tracking-wider uppercase text-white/80 border border-white/10 rounded-full px-3 py-1.5">
-                  {{ f }}
-                </li>
-              </ul>
-
-              <div class="mt-8 flex items-center justify-between border-t border-white/5 pt-6">
-                <div>
-                  <p class="eyebrow text-[10px]">Capacitate</p>
-                  <p class="font-display text-2xl gold-text">{{ v.capacity }}</p>
-                </div>
-                <a routerLink="/locatii" class="btn btn-ghost">Detalii</a>
+        <div class="mt-16 grid gap-8 lg:grid-cols-2">
+          @for (v of venues; track v.title; let i = $index) {
+            <article appReveal="up" [revealDelay]="i * 150"
+                     class="group hover-lift relative overflow-hidden rounded-4xl shadow-card">
+              <div class="img-cine aspect-[4/3]">
+                <img [src]="v.img" [alt]="v.title" loading="lazy" />
               </div>
-            </div>
-          </article>
+              <div class="absolute inset-0 bg-gradient-to-t from-ink-900/92 from-15% via-ink-900/45 via-50% to-transparent"></div>
+              <div class="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+                <p class="text-xs font-medium uppercase tracking-widest2 text-gold-200">{{ v.tag }}</p>
+                <h3 class="mt-2 font-display text-3xl text-cream-50 sm:text-4xl" style="text-shadow:0 2px 16px rgba(0,0,0,.4)">{{ v.title }}</h3>
+                <p class="mt-2 max-w-md text-sm text-cream-50/90">{{ v.desc }}</p>
+                <a routerLink="/locatii"
+                   class="mt-5 inline-flex items-center gap-2 text-sm font-medium text-gold-200 transition-all group-hover:gap-3">
+                  Detalii <span>→</span>
+                </a>
+              </div>
+            </article>
+          }
         </div>
       </div>
     </section>
   `
 })
 export class LocationsSectionComponent {
-  readonly venues: Venue[] = [
+  readonly venues = [
     {
-      tag: 'Atracția principală',
-      title: 'Cortul Premium',
-      subtitle: 'Panoramic, deasupra apei',
-      desc:
-        'Un cort elegant cu vedere completă spre lac, iluminat cald pentru atmosfera de seară. Plafon înalt, decor luxos, cinematografic — locul ideal pentru nunți de top și evenimente memorabile.',
-      image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1400&q=80',
-      capacity: '60 – 350 invitați',
-      features: ['Vedere panoramică', 'Iluminare warm', 'Ring central', 'Acces ponton', 'Aer condiționat']
+      title: 'Cort Premium pe Lac',
+      tag: 'În aer liber',
+      img: IMAGES.tentExterior,
+      desc: 'Structură elegantă cu pereți transparenți, lumini calde și vedere panoramică spre apă — magie sub stele.'
     },
     {
-      tag: 'Eleganță interioară',
       title: 'Sala Interioară',
-      subtitle: 'Rafinată și caldă',
-      desc:
-        'Un spațiu interior elegant, cu finisaje rafinate, perfect pentru evenimente mai intime — botezuri, cununii civile, aniversări și petreceri private în orice anotimp.',
-      image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1400&q=80',
-      capacity: '40 – 180 invitați',
-      features: ['Ambianță intimă', 'Ring de dans', 'Lounge bar', 'Foișor terasă', 'Climatizare']
+      tag: 'Eleganță all-season',
+      img: IMAGES.hallInterior,
+      desc: 'Spațiu rafinat, climatizat, cu tavane înalte și detalii aurii — perfect în orice anotimp.'
     }
   ];
 }

@@ -1,113 +1,149 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
+import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { GalleryService } from '../../core/services/gallery.service';
 import { GalleryCategory, GalleryImage } from '../../core/models/api.models';
-import { RevealDirective } from '../../shared/directives/reveal.directive';
+import { IMAGES } from '../../shared/data/images';
 
-interface CatTab { id: GalleryCategory | 'all'; label: string; }
+interface Photo { url: string; title?: string | null; category: string; }
 
-const FALLBACK: GalleryImage[] = [
-  { id: 1, url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80', category: 'lac', title: 'Apus pe lac', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 2, url: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=80', category: 'cort', title: 'Cort premium', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 3, url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80', category: 'exterior', title: 'Alei iluminate', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 4, url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=80', category: 'lac', title: 'Pontoane', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 5, url: 'https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?auto=format&fit=crop&w=1200&q=80', category: 'lac', title: 'Barcă foto', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 6, url: 'https://images.unsplash.com/photo-1530023367847-a683933f4172?auto=format&fit=crop&w=1200&q=80', category: 'nunti', title: 'Cununie pe ponton', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 7, url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80', category: 'nunti', title: 'Decor de seară', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 8, url: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=1200&q=80', category: 'petreceri', title: 'Petrecere privată', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 9, url: 'https://images.unsplash.com/photo-1462536943532-57a629f6cc60?auto=format&fit=crop&w=1200&q=80', category: 'botezuri', title: 'Botez elegant', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 10, url: 'https://images.unsplash.com/photo-1604017011826-d3b4c23f8914?auto=format&fit=crop&w=1200&q=80', category: 'sala', title: 'Sala interioară', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 11, url: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf5b?auto=format&fit=crop&w=1200&q=80', category: 'cort', title: 'Atmosferă de seară', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null },
-  { id: 12, url: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80', category: 'exterior', title: 'Foto loc romantic', sort_order: 0, is_published: true, created_at: '', thumbnail_url: null }
+const CATEGORIES: { key: GalleryCategory | 'all'; label: string }[] = [
+  { key: 'all', label: 'Toate' },
+  { key: 'nunti', label: 'Nunți' },
+  { key: 'botezuri', label: 'Botezuri' },
+  { key: 'petreceri', label: 'Petreceri' },
+  { key: 'cort', label: 'Cort' },
+  { key: 'sala', label: 'Sală' },
+  { key: 'lac', label: 'Lac' },
+  { key: 'exterior', label: 'Exterior' }
 ];
 
 @Component({
   selector: 'app-gallery',
   standalone: true,
-  imports: [CommonModule, RevealDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PageHeaderComponent, RevealDirective],
   template: `
-    <section class="pt-40 pb-12">
-      <div class="container-luxe px-6">
-        <span class="eyebrow">Galerie</span>
-        <h1 class="mt-4 font-display text-5xl md:text-7xl text-white">Atmosfera, surprinsă <span class="gold-text">cinematic</span>.</h1>
-        <p class="mt-6 text-white/70 max-w-2xl text-lg">O selecție din evenimentele Mirtanis — cort, sală, lac, pontoane și momentele dintre.</p>
+    <app-page-header
+      eyebrow="Galerie"
+      title="Momente surprinse la Mirtanis"
+      subtitle="O selecție din evenimentele care au prins viață pe malul lacului."
+      [image]="headerImg" />
 
-        <div class="mt-12 flex flex-wrap gap-2">
-          <button *ngFor="let t of tabs"
-                  (click)="setCategory(t.id)"
-                  [class.bg-gold-400]="active() === t.id"
-                  [class.text-ink-950]="active() === t.id"
-                  [class.bg-white]="false"
-                  [class.text-white]="active() !== t.id"
-                  class="px-5 py-2.5 rounded-full border border-white/10 hover:border-gold-400/60 text-sm tracking-wider uppercase transition-all duration-500">
-            {{ t.label }}
-          </button>
+    <section class="section">
+      <div class="container-x">
+        <!-- Filters -->
+        <div class="mb-10 flex flex-wrap justify-center gap-2 sm:gap-3">
+          @for (c of categories; track c.key) {
+            <button (click)="select(c.key)"
+                    class="rounded-full border px-4 py-2 text-sm transition-all tap-highlight-none"
+                    [class.border-gold-500]="active() === c.key"
+                    [class.bg-gold-500]="active() === c.key"
+                    [class.text-cream-50]="active() === c.key"
+                    [class.border-cream-400]="active() !== c.key"
+                    [class.text-ink-600]="active() !== c.key"
+                    [class.hover:border-gold-400]="active() !== c.key">
+              {{ c.label }}
+            </button>
+          }
         </div>
-      </div>
-    </section>
 
-    <section class="pb-32">
-      <div class="container-luxe px-6">
-        <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
-          <figure *ngFor="let img of visible(); let i = index" appReveal [revealDelay]="(i % 6) * 60"
-                  (click)="open(img)"
-                  class="group break-inside-avoid mb-6 cursor-zoom-in img-cine relative">
-            <img [src]="img.url" [alt]="img.title || 'Mirtanis Events'" loading="lazy"
-                 class="w-full h-auto block" />
-            <figcaption class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-ink-950/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-              <span class="eyebrow text-gold-300">{{ img.category }}</span>
-              <p class="font-display text-xl text-white">{{ img.title }}</p>
-            </figcaption>
-          </figure>
-        </div>
-        <p *ngIf="!visible().length" class="text-center text-white/50">Nu există imagini în această categorie.</p>
+        @if (loading()) {
+          <div class="columns-1 gap-4 sm:columns-2 lg:columns-3">
+            @for (s of skeletons; track $index) {
+              <div class="mb-4 animate-pulse rounded-2xl bg-cream-300" [style.height.px]="s"></div>
+            }
+          </div>
+        } @else if (filtered().length === 0) {
+          <p class="py-16 text-center text-ink-500">Nicio imagine în această categorie.</p>
+        } @else {
+          <div class="columns-1 gap-4 sm:columns-2 lg:columns-3 [column-fill:_balance]"
+               appReveal="up" [revealStagger]="60">
+            @for (p of filtered(); track p.url; let i = $index) {
+              <figure class="img-cine group relative mb-4 break-inside-avoid cursor-pointer rounded-2xl shadow-soft"
+                      (click)="open(i)">
+                <img [src]="p.url" [alt]="p.title || 'Fotografie eveniment'" loading="lazy" class="w-full" />
+                <figcaption class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink-900/60 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                  <span class="text-sm text-cream-50">{{ p.title || labelFor(p.category) }}</span>
+                </figcaption>
+              </figure>
+            }
+          </div>
+        }
       </div>
     </section>
 
     <!-- Lightbox -->
-    <div *ngIf="lightbox()" (click)="close()"
-         class="fixed inset-0 z-[80] bg-ink-950/95 backdrop-blur-xl flex items-center justify-center p-6 animate-[routeIn_.5s_ease]">
-      <button class="absolute top-6 right-6 text-white/70 hover:text-gold-300 text-3xl" aria-label="Close" (click)="close()">×</button>
-      <img [src]="lightbox()!.url" [alt]="lightbox()!.title || ''" class="max-h-[88vh] max-w-[92vw] object-contain rounded-2xl shadow-glow-gold" />
-    </div>
+    @if (lightbox() !== null) {
+      <div class="fixed inset-0 z-[80] flex items-center justify-center bg-ink-900/90 p-4 backdrop-blur-sm" (click)="close()">
+        <button class="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-cream-50/10 text-2xl text-cream-50 hover:bg-cream-50/20"
+                (click)="close(); $event.stopPropagation()" aria-label="Închide">×</button>
+        <button class="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-2xl text-cream-50 hover:bg-cream-50/20 sm:left-8"
+                (click)="prev(); $event.stopPropagation()" aria-label="Anterioara">‹</button>
+        <img [src]="filtered()[lightbox()!].url" [alt]="filtered()[lightbox()!].title || ''"
+             class="max-h-[85vh] max-w-[92vw] rounded-2xl object-contain shadow-lift" (click)="$event.stopPropagation()" />
+        <button class="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-2xl text-cream-50 hover:bg-cream-50/20 sm:right-8"
+                (click)="next(); $event.stopPropagation()" aria-label="Următoarea">›</button>
+      </div>
+    }
   `
 })
 export class GalleryComponent implements OnInit {
-  private readonly gallery = inject(GalleryService);
+  private readonly api = inject(GalleryService);
 
-  readonly tabs: CatTab[] = [
-    { id: 'all', label: 'Toate' },
-    { id: 'nunti', label: 'Nunți' },
-    { id: 'botezuri', label: 'Botezuri' },
-    { id: 'petreceri', label: 'Petreceri' },
-    { id: 'cort', label: 'Cort' },
-    { id: 'sala', label: 'Sala' },
-    { id: 'lac', label: 'Lac' },
-    { id: 'exterior', label: 'Exterior' }
-  ];
+  readonly headerImg = IMAGES.heroAlt;
+  readonly categories = CATEGORIES;
+  readonly skeletons = [240, 320, 280, 360, 220, 300, 260, 340, 300];
 
+  readonly photos = signal<Photo[]>([]);
   readonly active = signal<GalleryCategory | 'all'>('all');
-  readonly images = signal<GalleryImage[]>([]);
-  readonly lightbox = signal<GalleryImage | null>(null);
+  readonly loading = signal(true);
+  readonly lightbox = signal<number | null>(null);
 
-  readonly visible = () => {
-    const cat = this.active();
-    const all = this.images();
-    return cat === 'all' ? all : all.filter((i) => i.category === cat);
-  };
+  readonly filtered = computed(() => {
+    const a = this.active();
+    const all = this.photos();
+    return a === 'all' ? all : all.filter((p) => p.category === a);
+  });
 
   ngOnInit(): void {
-    this.gallery.list().subscribe({
-      next: (rows) => {
-        const resolved = rows.map((r) => ({ ...r, url: this.gallery.resolveUrl(r.url) }));
-        this.images.set(resolved.length ? resolved : FALLBACK);
+    this.api.list().subscribe({
+      next: (imgs: GalleryImage[]) => {
+        if (imgs && imgs.length) {
+          this.photos.set(imgs.map((i) => ({
+            url: this.api.resolveUrl(i.url),
+            title: i.title,
+            category: i.category
+          })));
+        } else {
+          this.photos.set(this.fallback());
+        }
+        this.loading.set(false);
       },
-      error: () => this.images.set(FALLBACK)
+      error: () => { this.photos.set(this.fallback()); this.loading.set(false); }
     });
   }
 
-  setCategory(c: GalleryCategory | 'all'): void { this.active.set(c); }
-  open(img: GalleryImage): void { this.lightbox.set(img); document.body.style.overflow = 'hidden'; }
+  private fallback(): Photo[] {
+    const cats = ['nunti', 'botezuri', 'cort', 'sala', 'lac', 'exterior', 'petreceri'];
+    return IMAGES.gallery.map((url, i) => ({ url, category: cats[i % cats.length] }));
+  }
+
+  select(key: GalleryCategory | 'all'): void { this.active.set(key); }
+
+  labelFor(cat: string): string {
+    return CATEGORIES.find((c) => c.key === cat)?.label ?? 'Mirtanis Events';
+  }
+
+  open(i: number): void { this.lightbox.set(i); document.body.style.overflow = 'hidden'; }
   close(): void { this.lightbox.set(null); document.body.style.overflow = ''; }
+  next(): void { this.lightbox.update((v) => v === null ? v : (v + 1) % this.filtered().length); }
+  prev(): void { this.lightbox.update((v) => v === null ? v : (v - 1 + this.filtered().length) % this.filtered().length); }
+
+  @HostListener('document:keydown', ['$event'])
+  onKey(e: KeyboardEvent): void {
+    if (this.lightbox() === null) return;
+    if (e.key === 'Escape') this.close();
+    if (e.key === 'ArrowRight') this.next();
+    if (e.key === 'ArrowLeft') this.prev();
+  }
 }

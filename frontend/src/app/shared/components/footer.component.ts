@@ -1,63 +1,64 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink],
   template: `
-    <footer class="relative mt-24 border-t border-white/5 bg-ink-950">
-      <div class="absolute inset-x-0 -top-px gold-line"></div>
+    <footer class="relative mt-10 overflow-hidden bg-sage-700 text-cream-100">
+      <div class="pointer-events-none absolute inset-0 opacity-[0.06]"
+           style="background-image:radial-gradient(circle at 20% 20%, #fff 0, transparent 40%), radial-gradient(circle at 80% 60%, #fff 0, transparent 35%);"></div>
 
-      <div class="container-luxe px-6 py-20 grid gap-12 md:grid-cols-4">
-        <div class="md:col-span-2">
-          <h3 class="font-display text-3xl md:text-4xl gold-text">Mirtanis Events</h3>
-          <p class="mt-4 max-w-md text-white/65 leading-relaxed">
-            „Un loc de vis.” O locație de poveste pe lac, dedicată momentelor care merită
-            să rămână cu tine pentru totdeauna.
-          </p>
-          <div class="mt-6 flex items-center gap-4 text-white/70">
-            <span class="flex items-center gap-1.5 text-gold-300">
-              <span *ngFor="let s of [1,2,3,4,5]" class="text-base">★</span>
-            </span>
-            <span class="text-sm">4.5 / 5 — Google Reviews</span>
+      <div class="container-x relative py-16 sm:py-20">
+        <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+          <!-- Brand -->
+          <div class="lg:col-span-1">
+            <img src="/logo-mare.png" alt="Mirtanis Events" class="h-14 w-auto" />
+            <p class="mt-5 max-w-xs text-sm leading-relaxed text-cream-100/70">
+              O locație de poveste pe malul lacului, unde fiecare nuntă, botez sau eveniment devine o amintire de neuitat.
+            </p>
+          </div>
+
+          <!-- Nav -->
+          <div>
+            <h4 class="mb-4 text-xs uppercase tracking-widest2 text-gold-200">Navigare</h4>
+            <ul class="space-y-3 text-sm text-cream-100/75">
+              <li><a routerLink="/" class="transition-colors hover:text-gold-200">Acasă</a></li>
+              <li><a routerLink="/locatii" class="transition-colors hover:text-gold-200">Locații</a></li>
+              <li><a routerLink="/galerie" class="transition-colors hover:text-gold-200">Galerie</a></li>
+              <li><a routerLink="/rezervari" class="transition-colors hover:text-gold-200">Rezervări</a></li>
+              <li><a routerLink="/contact" class="transition-colors hover:text-gold-200">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- Contact -->
+          <div>
+            <h4 class="mb-4 text-xs uppercase tracking-widest2 text-gold-200">Contact</h4>
+            <ul class="space-y-3 text-sm text-cream-100/75">
+              <li>Malul Lacului, România</li>
+              <li><a href="tel:+407XXXXXXXX" class="transition-colors hover:text-gold-200">+40 7XX XXX XXX</a></li>
+              <li><a href="mailto:contact@mirtanis.ro" class="transition-colors hover:text-gold-200">contact&#64;mirtanis.ro</a></li>
+            </ul>
+          </div>
+
+          <!-- CTA -->
+          <div>
+            <h4 class="mb-4 text-xs uppercase tracking-widest2 text-gold-200">Plănuiește vizita</h4>
+            <p class="mb-5 text-sm text-cream-100/70">Verifică disponibilitatea datei tale în câteva secunde.</p>
+            <a routerLink="/rezervari" class="btn btn-gold w-full sm:w-auto">Verifică data</a>
           </div>
         </div>
 
-        <div>
-          <h4 class="eyebrow mb-4">Navigare</h4>
-          <ul class="space-y-2 text-white/75 text-sm">
-            <li><a routerLink="/" class="hover:text-gold-200 transition">Acasă</a></li>
-            <li><a routerLink="/locatii" class="hover:text-gold-200 transition">Locații</a></li>
-            <li><a routerLink="/galerie" class="hover:text-gold-200 transition">Galerie</a></li>
-            <li><a routerLink="/rezervari" class="hover:text-gold-200 transition">Rezervări</a></li>
-            <li><a routerLink="/contact" class="hover:text-gold-200 transition">Contact</a></li>
-          </ul>
+        <div class="leaf-divider my-10 opacity-60">
+          <span class="!bg-cream-100/30"></span>
+          <span class="script text-2xl !text-gold-200">Mirtanis</span>
+          <span class="!bg-cream-100/30"></span>
         </div>
 
-        <div>
-          <h4 class="eyebrow mb-4">Contact</h4>
-          <ul class="space-y-2 text-white/75 text-sm">
-            <li>Lacul Mirtanis, România</li>
-            <li>+40 700 000 000</li>
-            <li>contact&#64;mirtanis.ro</li>
-            <li class="pt-3 flex gap-3">
-              <a href="#" class="hover:text-gold-200 transition">Instagram</a>
-              <span class="text-white/30">·</span>
-              <a href="#" class="hover:text-gold-200 transition">Facebook</a>
-              <span class="text-white/30">·</span>
-              <a href="#" class="hover:text-gold-200 transition">TikTok</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="border-t border-white/5">
-        <div class="container-luxe px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/45">
-          <span>© {{ year }} Mirtanis Events. Toate drepturile rezervate.</span>
-          <span class="italic font-display text-sm text-white/55">„Cea mai frumoasă locație pentru evenimente.”</span>
+        <div class="flex flex-col items-center justify-between gap-3 text-xs text-cream-100/50 sm:flex-row">
+          <p>© {{ year }} Mirtanis Events. Toate drepturile rezervate.</p>
+          <p>Creat cu grijă pentru momentele care contează.</p>
         </div>
       </div>
     </footer>

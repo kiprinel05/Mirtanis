@@ -1,203 +1,263 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { AvailabilityCalendarComponent } from './components/availability-calendar.component';
-import { BookingService } from '../../core/services/booking.service';
-import { EventType } from '../../core/models/api.models';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
+import { BookingService } from '../../core/services/booking.service';
+import { DayStatus, EventType } from '../../core/models/api.models';
+import { IMAGES } from '../../shared/data/images';
 
-interface EventOption { id: EventType; label: string; }
+const EVENT_TYPES: { value: EventType; label: string }[] = [
+  { value: 'nunta', label: 'Nuntă' },
+  { value: 'botez', label: 'Botez' },
+  { value: 'cununie', label: 'Cununie' },
+  { value: 'aniversare', label: 'Aniversare' },
+  { value: 'corporate', label: 'Corporate' },
+  { value: 'private', label: 'Eveniment privat' },
+  { value: 'garden', label: 'Garden party' },
+  { value: 'altul', label: 'Altul' }
+];
 
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AvailabilityCalendarComponent, RevealDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule, PageHeaderComponent, AvailabilityCalendarComponent, RevealDirective],
   template: `
-    <section class="pt-40 pb-16">
-      <div class="container-luxe px-6 max-w-5xl">
-        <span class="eyebrow">Rezervări</span>
-        <h1 class="mt-4 font-display text-5xl md:text-7xl text-white">Verifică <span class="gold-text">disponibilitatea</span>.</h1>
-        <p class="mt-6 text-white/70 max-w-2xl text-lg">Alege o dată din calendar și completează formularul în 3 pași. Te contactăm în maximum 24 de ore pentru confirmare.</p>
-      </div>
-    </section>
+    <app-page-header
+      eyebrow="Rezervări"
+      title="Verifică disponibilitatea"
+      subtitle="Alege data dorită din calendar și completează detaliile — îți răspundem cu o ofertă personalizată."
+      [image]="headerImg" />
 
-    <section class="pb-32">
-      <div class="container-luxe px-6 grid lg:grid-cols-2 gap-10">
+    <section class="section">
+      <div class="container-x grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
         <!-- Calendar -->
-        <div appReveal>
-          <app-availability-calendar (dateSelected)="onDate($event)"></app-availability-calendar>
-
-          <div *ngIf="selectedDate()" class="mt-5 glass rounded-2xl px-5 py-4 flex items-center justify-between">
-            <div>
-              <p class="eyebrow text-[10px] text-gold-300">Dată selectată</p>
-              <p class="font-display text-xl text-white">{{ selectedDate() | date:'fullDate':undefined:'ro-RO' }}</p>
-            </div>
-            <span class="text-emerald-300 text-sm flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Disponibil
-            </span>
-          </div>
+        <div class="card h-fit p-6 sm:p-8" appReveal="left">
+          <h2 class="mb-1 font-display text-2xl text-ink-900">Calendar disponibilitate</h2>
+          <p class="mb-6 text-sm text-ink-500">Zilele verzi sunt libere. Apasă pe o zi pentru a o selecta.</p>
+          <app-availability-calendar
+            [days]="days()"
+            [selected]="selectedDay()"
+            (daySelected)="onDayPicked($event)"
+            (monthChanged)="loadMonth($event)" />
         </div>
 
-        <!-- Multi-step form -->
-        <div appReveal [revealDelay]="150" class="glass rounded-3xl p-7 md:p-9">
-          <!-- Progress -->
-          <div class="flex items-center gap-3 mb-8">
-            <ng-container *ngFor="let s of [1,2,3]; let i = index">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm border transition-all duration-500"
-                     [ngClass]="s <= step() ? 'bg-gold-400 text-ink-950 border-gold-400' : 'bg-transparent text-white/60 border-white/15'">
-                  {{ s }}
+        <!-- Stepper form -->
+        <div class="card p-6 sm:p-8" appReveal="right" [revealDelay]="120">
+          <ol class="mb-8 flex items-center">
+            @for (s of stepLabels; track s; let i = $index) {
+              <li class="flex flex-1 items-center last:flex-none">
+                <div class="flex flex-col items-center">
+                  <span class="grid h-9 w-9 place-items-center rounded-full text-sm font-medium transition"
+                        [class.bg-gold-500]="step() >= i + 1"
+                        [class.text-cream-50]="step() >= i + 1"
+                        [class.bg-cream-300]="step() < i + 1"
+                        [class.text-ink-500]="step() < i + 1">{{ i + 1 }}</span>
+                  <span class="mt-1.5 hidden text-[10px] uppercase tracking-widest2 text-ink-500 sm:block">{{ s }}</span>
                 </div>
-                <span class="text-xs tracking-widest uppercase"
-                      [ngClass]="s === step() ? 'text-white' : 'text-white/40'">{{ stepLabel(s) }}</span>
-              </div>
-              <span *ngIf="i < 2" class="flex-1 h-px bg-white/10"></span>
-            </ng-container>
-          </div>
+                @if (i < 2) {
+                  <span class="mx-2 h-px flex-1 transition" [class.bg-gold-400]="step() > i + 1" [class.bg-cream-300]="step() <= i + 1"></span>
+                }
+              </li>
+            }
+          </ol>
 
-          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-            <!-- STEP 1 -->
-            <div *ngIf="step() === 1" class="space-y-5 animate-[routeIn_.5s_ease]">
-              <div>
-                <label class="eyebrow text-[10px]">Tip eveniment</label>
-                <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <button *ngFor="let o of events" type="button" (click)="form.patchValue({event_type: o.id})"
-                          class="px-3 py-3 rounded-xl border text-sm transition-all duration-300"
-                          [ngClass]="form.value.event_type === o.id ? 'bg-gold-400/15 border-gold-400 text-white' : 'border-white/10 text-white/75 hover:border-gold-400/40'">
-                    {{ o.label }}
-                  </button>
+          @if (success()) {
+            <div class="py-10 text-center">
+              <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-sage-100 text-3xl text-sage-600">✓</div>
+              <h3 class="font-display text-3xl text-ink-900">Cererea a fost trimisă!</h3>
+              <p class="mx-auto mt-3 max-w-sm text-ink-600">
+                Mulțumim! Te vom contacta în cel mai scurt timp pentru a confirma detaliile evenimentului tău.
+              </p>
+              <button class="btn btn-outline mt-8" (click)="reset()">Trimite o nouă cerere</button>
+            </div>
+          } @else {
+            <form [formGroup]="form" (ngSubmit)="submit()">
+              <!-- STEP 1 — event -->
+              @if (step() === 1) {
+                <div class="space-y-5">
+                  <div>
+                    <label class="field-label">Tip eveniment</label>
+                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      @for (t of eventTypes; track t.value) {
+                        <button type="button" (click)="form.controls.event_type.setValue(t.value)"
+                                class="rounded-xl border px-3 py-2.5 text-sm transition"
+                                [class.border-gold-500]="form.value.event_type === t.value"
+                                [class.bg-gold-50]="form.value.event_type === t.value"
+                                [class.text-gold-700]="form.value.event_type === t.value"
+                                [class.border-cream-400]="form.value.event_type !== t.value"
+                                [class.text-ink-600]="form.value.event_type !== t.value">
+                          {{ t.label }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label class="field-label">Data evenimentului</label>
+                      <input class="field" formControlName="event_date" type="date" [min]="todayIso" />
+                    </div>
+                    <div>
+                      <label class="field-label">Număr invitați</label>
+                      <input class="field" formControlName="guests" type="number" min="1" max="2000" placeholder="ex. 150" />
+                    </div>
+                  </div>
+                  <div class="flex justify-end">
+                    <button type="button" class="btn btn-gold" (click)="nextStep()" [disabled]="!step1Valid()">Continuă</button>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label class="eyebrow text-[10px]">Număr invitați</label>
-                <input type="number" min="1" max="2000" formControlName="guests" class="input"/>
-              </div>
-              <div>
-                <label class="eyebrow text-[10px]">Dată dorită</label>
-                <input type="date" formControlName="event_date" class="input"/>
-                <p class="text-xs text-white/45 mt-1">Tip: poți selecta și direct din calendar.</p>
-              </div>
-            </div>
+              }
 
-            <!-- STEP 2 -->
-            <div *ngIf="step() === 2" class="space-y-5 animate-[routeIn_.5s_ease]">
-              <div>
-                <label class="eyebrow text-[10px]">Nume complet</label>
-                <input type="text" formControlName="full_name" class="input" placeholder="Andreea Popescu"/>
-              </div>
-              <div class="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="eyebrow text-[10px]">Telefon</label>
-                  <input type="tel" formControlName="phone" class="input" placeholder="+40 7..."/>
+              <!-- STEP 2 — contact -->
+              @if (step() === 2) {
+                <div class="space-y-5">
+                  <div>
+                    <label class="field-label">Nume complet</label>
+                    <input class="field" formControlName="full_name" type="text" placeholder="Numele tău" />
+                  </div>
+                  <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label class="field-label">Telefon</label>
+                      <input class="field" formControlName="phone" type="tel" placeholder="07XX XXX XXX" />
+                    </div>
+                    <div>
+                      <label class="field-label">Email</label>
+                      <input class="field" formControlName="email" type="email" placeholder="email@exemplu.ro" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="field-label">Mesaj (opțional)</label>
+                    <textarea class="field min-h-[110px] resize-none" formControlName="message" placeholder="Spune-ne mai multe despre evenimentul tău…"></textarea>
+                  </div>
+                  <div class="flex justify-between">
+                    <button type="button" class="btn btn-ghost" (click)="prevStep()">← Înapoi</button>
+                    <button type="button" class="btn btn-gold" (click)="nextStep()" [disabled]="!step2Valid()">Continuă</button>
+                  </div>
                 </div>
-                <div>
-                  <label class="eyebrow text-[10px]">Email</label>
-                  <input type="email" formControlName="email" class="input" placeholder="nume&#64;mail.com"/>
+              }
+
+              <!-- STEP 3 — confirm -->
+              @if (step() === 3) {
+                <div class="space-y-5">
+                  <h3 class="font-display text-2xl text-ink-900">Confirmă detaliile</h3>
+                  <dl class="divide-y divide-cream-300 rounded-2xl border border-cream-300 bg-cream-100">
+                    @for (row of summary(); track row.k) {
+                      <div class="flex justify-between gap-4 px-4 py-3 text-sm">
+                        <dt class="text-ink-500">{{ row.k }}</dt>
+                        <dd class="text-right font-medium text-ink-800">{{ row.v }}</dd>
+                      </div>
+                    }
+                  </dl>
+                  @if (error()) { <p class="text-sm text-blush-400">{{ error() }}</p> }
+                  <div class="flex justify-between">
+                    <button type="button" class="btn btn-ghost" (click)="prevStep()">← Înapoi</button>
+                    <button type="submit" class="btn btn-gold" [disabled]="loading()">
+                      {{ loading() ? 'Se trimite…' : 'Trimite cererea' }}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- STEP 3 -->
-            <div *ngIf="step() === 3" class="space-y-5 animate-[routeIn_.5s_ease]">
-              <div>
-                <label class="eyebrow text-[10px]">Mesaj (opțional)</label>
-                <textarea rows="5" formControlName="message" class="input" placeholder="Spune-ne mai multe despre eveniment, viziune, detalii..."></textarea>
-              </div>
-              <div class="rounded-2xl border border-white/10 p-5 text-sm text-white/75 space-y-1.5">
-                <p class="eyebrow text-[10px] text-gold-300 mb-2">Rezumat cerere</p>
-                <p><span class="text-white/50">Eveniment:</span> {{ getEventLabel(form.value.event_type) }}</p>
-                <p><span class="text-white/50">Dată:</span> {{ form.value.event_date }}</p>
-                <p><span class="text-white/50">Invitați:</span> {{ form.value.guests }}</p>
-                <p><span class="text-white/50">Contact:</span> {{ form.value.full_name }} · {{ form.value.email }} · {{ form.value.phone }}</p>
-              </div>
-            </div>
-
-            <!-- Feedback -->
-            <div *ngIf="error()" class="mt-5 rounded-xl border border-rose-400/30 bg-rose-400/10 text-rose-100 text-sm p-4">{{ error() }}</div>
-            <div *ngIf="success()" class="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-100 text-sm p-4 animate-[routeIn_.6s_ease]">
-              Mulțumim! Cererea a fost trimisă cu succes. Te contactăm în scurt timp.
-            </div>
-
-            <!-- Actions -->
-            <div class="mt-8 flex items-center justify-between">
-              <button type="button" *ngIf="step() > 1" (click)="prev()" class="text-white/70 hover:text-white text-sm tracking-widest uppercase">← Înapoi</button>
-              <span *ngIf="step() === 1"></span>
-              <button *ngIf="step() < 3" type="button" (click)="nextStep()" [disabled]="!stepValid()" class="btn btn-primary disabled:opacity-50">Continuă →</button>
-              <button *ngIf="step() === 3" type="submit" [disabled]="submitting()" class="btn btn-primary disabled:opacity-50">
-                {{ submitting() ? 'Se trimite...' : 'Trimite cererea' }}
-              </button>
-            </div>
-          </form>
+              }
+            </form>
+          }
         </div>
       </div>
     </section>
-  `,
-  styles: [`
-    .input {
-      @apply mt-2 block w-full bg-ink-900/60 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 outline-none transition-all duration-300;
-    }
-    .input:focus { @apply border-gold-400 ring-2 ring-gold-400/20 bg-ink-900/80; }
-  `]
+  `
 })
-export class BookingComponent {
+export class BookingComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly bookings = inject(BookingService);
+  private readonly api = inject(BookingService);
 
-  readonly events: EventOption[] = [
-    { id: 'nunta', label: 'Nuntă' },
-    { id: 'botez', label: 'Botez' },
-    { id: 'cununie', label: 'Cununie' },
-    { id: 'aniversare', label: 'Aniversare' },
-    { id: 'corporate', label: 'Corporate' },
-    { id: 'private', label: 'Privat' },
-    { id: 'garden', label: 'Garden Party' },
-    { id: 'altul', label: 'Altul' }
-  ];
+  readonly headerImg = IMAGES.ceremonyChairs;
+  readonly eventTypes = EVENT_TYPES;
+  readonly stepLabels = ['Eveniment', 'Contact', 'Confirmare'];
+  readonly todayIso = new Date().toISOString().slice(0, 10);
 
   readonly step = signal(1);
-  readonly submitting = signal(false);
+  readonly days = signal<DayStatus[]>([]);
+  readonly selectedDay = signal<string | null>(null);
+  readonly loading = signal(false);
   readonly success = signal(false);
   readonly error = signal<string | null>(null);
-  readonly selectedDate = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     event_type: ['nunta' as EventType, Validators.required],
-    guests: [80, [Validators.required, Validators.min(1), Validators.max(2000)]],
     event_date: ['', Validators.required],
+    guests: [100, [Validators.required, Validators.min(1), Validators.max(2000)]],
     full_name: ['', [Validators.required, Validators.minLength(2)]],
     phone: ['', [Validators.required, Validators.minLength(6)]],
     email: ['', [Validators.required, Validators.email]],
     message: ['']
   });
 
-  onDate(iso: string): void {
-    this.selectedDate.set(iso);
-    this.form.patchValue({ event_date: iso });
+  readonly summary = computed(() => {
+    const v = this.form.getRawValue();
+    const label = EVENT_TYPES.find((t) => t.value === v.event_type)?.label ?? v.event_type;
+    return [
+      { k: 'Eveniment', v: label },
+      { k: 'Data', v: v.event_date || '—' },
+      { k: 'Invitați', v: String(v.guests) },
+      { k: 'Nume', v: v.full_name },
+      { k: 'Telefon', v: v.phone },
+      { k: 'Email', v: v.email }
+    ];
+  });
+
+  ngOnInit(): void {
+    const now = new Date();
+    this.loadMonth({
+      start: this.iso(new Date(now.getFullYear(), now.getMonth(), 1)),
+      end: this.iso(new Date(now.getFullYear(), now.getMonth() + 1, 0))
+    });
   }
 
-  stepLabel(s: number): string {
-    return ({ 1: 'Eveniment', 2: 'Contact', 3: 'Confirmare' } as Record<number, string>)[s];
+  loadMonth(range: { start: string; end: string }): void {
+    this.api.getCalendar(range.start, range.end).subscribe({
+      next: (res) => this.days.set(res.days),
+      error: () => this.days.set([])
+    });
   }
 
-  stepValid(): boolean {
-    const v = this.form.value;
-    if (this.step() === 1) return !!v.event_type && !!v.event_date && (v.guests ?? 0) > 0;
-    if (this.step() === 2) return this.form.get('full_name')!.valid && this.form.get('phone')!.valid && this.form.get('email')!.valid;
-    return this.form.valid;
+  onDayPicked(iso: string): void {
+    this.selectedDay.set(iso);
+    this.form.controls.event_date.setValue(iso);
   }
 
-  nextStep(): void { if (this.stepValid()) this.step.update((s) => Math.min(3, s + 1)); }
-  prev(): void { this.step.update((s) => Math.max(1, s - 1)); }
+  step1Valid(): boolean {
+    return this.form.controls.event_type.valid && this.form.controls.event_date.valid && this.form.controls.guests.valid;
+  }
+  step2Valid(): boolean {
+    return this.form.controls.full_name.valid && this.form.controls.phone.valid && this.form.controls.email.valid;
+  }
 
-  getEventLabel(id?: EventType): string { return this.events.find((e) => e.id === id)?.label ?? ''; }
+  nextStep(): void {
+    if (this.step() === 1 && !this.step1Valid()) return;
+    if (this.step() === 2 && !this.step2Valid()) return;
+    this.step.update((s) => Math.min(3, s + 1));
+  }
+  prevStep(): void { this.step.update((s) => Math.max(1, s - 1)); }
 
   submit(): void {
-    if (!this.form.valid) return;
-    this.error.set(null); this.submitting.set(true);
-    this.bookings.createBooking(this.form.getRawValue()).subscribe({
-      next: () => { this.submitting.set(false); this.success.set(true); this.form.reset(); this.step.set(1); this.selectedDate.set(null); },
-      error: (err) => { this.submitting.set(false); this.error.set(err?.error?.detail || 'A apărut o eroare. Încearcă din nou.'); }
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    this.loading.set(true);
+    this.error.set(null);
+    this.api.createBooking(this.form.getRawValue()).subscribe({
+      next: () => { this.loading.set(false); this.success.set(true); },
+      error: (e) => {
+        this.loading.set(false);
+        this.error.set(e?.error?.detail?.[0]?.msg ?? e?.error?.detail ?? 'A apărut o eroare. Încearcă din nou.');
+      }
     });
+  }
+
+  reset(): void {
+    this.form.reset({ event_type: 'nunta', guests: 100, event_date: '', full_name: '', phone: '', email: '', message: '' });
+    this.selectedDay.set(null);
+    this.step.set(1);
+    this.success.set(false);
+  }
+
+  private iso(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 }

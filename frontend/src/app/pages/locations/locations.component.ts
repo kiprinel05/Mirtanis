@@ -1,96 +1,113 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
-import { ParallaxDirective } from '../../shared/directives/parallax.directive';
+import { IMAGES } from '../../shared/data/images';
 
 interface Venue {
-  name: string;
   tag: string;
-  intro: string;
-  long: string;
+  title: string;
   capacity: string;
+  desc: string;
   features: string[];
-  gallery: string[];
+  images: string[];
 }
 
 @Component({
   selector: 'app-locations',
   standalone: true,
-  imports: [CommonModule, RouterLink, RevealDirective, ParallaxDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, PageHeaderComponent, RevealDirective],
   template: `
-    <section class="pt-40 pb-16">
-      <div class="container-luxe px-6 max-w-5xl">
-        <span class="eyebrow">Locațiile noastre</span>
-        <h1 class="mt-4 font-display text-5xl md:text-7xl text-white">Două lumi, <span class="gold-text">o singură poveste</span>.</h1>
-        <p class="mt-6 text-white/70 max-w-2xl text-lg">Cortul premium pentru momente cinematice deasupra apei, sala interioară pentru eleganță rafinată în orice anotimp.</p>
-      </div>
-    </section>
+    <app-page-header
+      eyebrow="Locațiile noastre"
+      title="Două decoruri de poveste"
+      subtitle="Alege cadrul perfect pentru evenimentul tău — sub cerul liber lângă lac, sau în eleganța caldă a sălii interioare."
+      [image]="headerImg" />
 
-    <section *ngFor="let v of venues; let i = index" class="section relative" [class.bg-ink-900]="i % 2 === 1">
-      <div class="container-luxe grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        <div class="lg:col-span-5 order-2"
-             [ngClass]="i % 2 === 0 ? 'lg:order-1' : 'lg:order-2'">
-          <span appReveal class="eyebrow">{{ v.tag }}</span>
-          <h2 appReveal [revealDelay]="100" class="mt-5 font-display text-4xl md:text-6xl text-white leading-[1.05]">{{ v.name }}</h2>
-          <p appReveal [revealDelay]="200" class="mt-5 text-gold-200 italic font-display text-2xl">{{ v.intro }}</p>
-          <div appReveal [revealDelay]="300" class="divider-gold w-20 mt-7"></div>
-          <p appReveal [revealDelay]="350" class="mt-7 text-white/75 leading-relaxed">{{ v.long }}</p>
-
-          <ul appReveal [revealDelay]="450" class="mt-8 flex flex-wrap gap-2">
-            <li *ngFor="let f of v.features" class="text-xs tracking-wider uppercase text-white/80 border border-white/10 rounded-full px-3 py-1.5">{{ f }}</li>
-          </ul>
-
-          <div appReveal [revealDelay]="550" class="mt-10 flex items-center gap-6">
-            <div>
-              <p class="eyebrow text-[10px]">Capacitate</p>
-              <p class="font-display text-3xl gold-text">{{ v.capacity }}</p>
+    <div class="section">
+      <div class="container-x space-y-24 lg:space-y-36">
+        @for (v of venues; track v.title; let i = $index) {
+          <article class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+            <!-- Images -->
+            <div class="order-1" [class.lg:order-2]="i % 2 === 1" appReveal="up">
+              <div class="img-cine gold-frame hover-lift relative aspect-[4/3] rounded-3xl shadow-card">
+                <img [src]="v.images[0]" [alt]="v.title" loading="lazy" />
+                <span class="absolute left-4 top-4 z-[3] rounded-full bg-cream-50/95 px-4 py-1.5 text-xs font-medium uppercase tracking-widest2 text-gold-700 shadow-soft">{{ v.capacity }}</span>
+              </div>
+              <div class="mt-4 grid grid-cols-2 gap-4">
+                <div class="img-cine aspect-[4/3] rounded-2xl shadow-soft">
+                  <img [src]="v.images[1]" [alt]="v.title" loading="lazy" />
+                </div>
+                <div class="img-cine aspect-[4/3] rounded-2xl shadow-soft">
+                  <img [src]="v.images[2]" [alt]="v.title" loading="lazy" />
+                </div>
+              </div>
             </div>
-            <a routerLink="/rezervari" class="btn btn-primary">Verifică data</a>
-          </div>
-        </div>
 
-        <div class="lg:col-span-7 relative h-[520px] md:h-[620px] order-1"
-             [ngClass]="i % 2 === 0 ? 'lg:order-2' : 'lg:order-1'">
-          <div appParallax [parallaxFactor]="0.06" class="absolute top-0 right-0 w-3/4 h-3/4 img-cine shadow-glass">
-            <img [src]="v.gallery[0]" [alt]="v.name" loading="lazy" class="w-full h-full object-cover"/>
-          </div>
-          <div appParallax [parallaxFactor]="-0.05" class="absolute bottom-0 left-0 w-1/2 h-1/2 img-cine shadow-glass border border-gold-400/20">
-            <img [src]="v.gallery[1]" [alt]="v.name" loading="lazy" class="w-full h-full object-cover"/>
-          </div>
+            <!-- Text -->
+            <div class="order-2" [class.lg:order-1]="i % 2 === 1" appReveal="up" [revealDelay]="120">
+              <p class="eyebrow">{{ v.tag }}</p>
+              <h2 class="mt-4 font-display text-4xl text-ink-900 sm:text-5xl">{{ v.title }}</h2>
+              <p class="mt-5 text-lg leading-relaxed text-ink-600">{{ v.desc }}</p>
+              <ul class="mt-8 grid gap-3 sm:grid-cols-2" appReveal="up" [revealStagger]="70" [revealDelay]="150">
+                @for (f of v.features; track f) {
+                  <li class="flex items-center gap-3 text-ink-700">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sage-100 text-sm text-sage-600">✓</span>
+                    {{ f }}
+                  </li>
+                }
+              </ul>
+              <a routerLink="/rezervari" class="btn btn-gold mt-10">Verifică disponibilitatea</a>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+
+    <!-- Mini CTA -->
+    <section class="section pt-0">
+      <div class="container-x">
+        <div class="card flex flex-col items-center gap-5 px-7 py-12 text-center sm:px-12">
+          <p class="script text-3xl">Vino să vezi cu ochii tăi</p>
+          <h3 class="font-display text-3xl text-ink-900 sm:text-4xl">Programează o vizită la locație</h3>
+          <a routerLink="/contact" class="btn btn-outline">Contactează-ne</a>
         </div>
       </div>
     </section>
   `
 })
 export class LocationsComponent {
+  readonly headerImg = IMAGES.tentExterior;
   readonly venues: Venue[] = [
     {
-      name: 'Cortul Premium',
-      tag: 'Atracția principală',
-      intro: 'Panoramic, cinematic, peste apă.',
-      long:
-        'Cortul nostru este principala atracție a complexului. Construit pe ponton, cu vedere completă spre lac, oferă o experiență cinematică indiferent de moment — soare blând la prânz, lumini calde la apus, lampioane reflectate pe apă noaptea. Plafonul înalt, decorul rafinat și acustica gândită fac din el alegerea perfectă pentru nunți de top.',
-      capacity: '60 – 350 invitați',
-      features: ['Vedere panoramică', 'Iluminare ambientală', 'Ring central', 'Acces direct ponton', 'Aer condiționat', 'Backstage privat'],
-      gallery: [
-        'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1400&q=80',
-        'https://images.unsplash.com/photo-1490578474895-699cd4e2cf5b?auto=format&fit=crop&w=1200&q=80'
-      ]
+      tag: 'În aer liber · pe lac',
+      title: 'Cort Premium pe Lac',
+      capacity: 'Până la 350 invitați',
+      desc: 'Un cort elegant cu pereți transparenți, deschis către apă și cer. Ziua, lumina naturală se revarsă înăuntru; seara, ghirlandele aurii transformă totul într-un decor de basm.',
+      features: [
+        'Capacitate până la 350 de invitați',
+        'Vedere panoramică spre lac',
+        'Ring de dans și scenă',
+        'Iluminat ambiental & ghirlande',
+        'Acces direct la ponton',
+        'Climatizare pentru sezonul cald'
+      ],
+      images: [IMAGES.tentExterior, IMAGES.ceremonyChairs, IMAGES.stringLights]
     },
     {
-      name: 'Sala Interioară',
-      tag: 'Eleganță atemporală',
-      intro: 'Caldă, rafinată, intimă.',
-      long:
-        'Sala interioară este completarea perfectă pentru cort. Cu finisaje elegante, lumini ambientale și o ambianță caldă, este spațiul ideal pentru botezuri, cununii civile, aniversări și petreceri private — în orice anotimp.',
-      capacity: '40 – 180 invitați',
-      features: ['Ambianță intimă', 'Ring de dans', 'Lounge bar', 'Foișor terasă', 'Climatizare', 'Acustică premium'],
-      gallery: [
-        'https://images.unsplash.com/photo-1604017011826-d3b4c23f8914?auto=format&fit=crop&w=1400&q=80',
-        'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80'
-      ]
+      tag: 'Eleganță all-season',
+      title: 'Sala Interioară',
+      capacity: 'Până la 500 invitați',
+      desc: 'Un spațiu rafinat, cu tavane înalte, candelabre și detalii aurii. Perfect climatizat, este alegerea ideală pentru orice anotimp și pentru evenimente intime sau ample, deopotrivă.',
+      features: [
+        'Capacitate până la 500 de invitați',
+        'Climatizare completă',
+        'Sistem audio-video profesional',
+        'Lounge & zonă de protocol',
+        'Bucătărie proprie',
+        'Decor personalizabil'
+      ],
+      images: [IMAGES.hallInterior, IMAGES.tentInterior, IMAGES.champagne]
     }
   ];
 }

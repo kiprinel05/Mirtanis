@@ -1,36 +1,38 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
+import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-cta-section',
   standalone: true,
-  imports: [CommonModule, RouterLink, RevealDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, RevealDirective],
   template: `
-    <section class="section relative overflow-hidden">
-      <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=2000&q=80"
-             alt="Cort premium" class="w-full h-full object-cover" loading="lazy"/>
-        <div class="absolute inset-0 bg-ink-950/80"></div>
-        <div class="absolute inset-0 bg-lux-radial"></div>
-      </div>
-      <div class="container-luxe relative z-10 text-center max-w-3xl">
-        <span appReveal class="eyebrow">Începem povestea ta?</span>
-        <h2 appReveal [revealDelay]="100" class="mt-5 font-display text-5xl md:text-7xl text-white leading-[1]">
-          Programează o <span class="gold-text">vizită privată</span>.
-        </h2>
-        <p appReveal [revealDelay]="200" class="mt-7 text-white/75 text-lg leading-relaxed">
-          Vino să descoperi locația în liniște, alături de echipa noastră. Îți arătăm cortul,
-          sala, pontoanele și răspundem la toate întrebările tale.
-        </p>
-        <div appReveal [revealDelay]="300" class="mt-10 flex flex-wrap justify-center gap-4">
-          <a routerLink="/rezervari" class="btn btn-primary">Verifică disponibilitatea</a>
-          <a routerLink="/contact" class="btn btn-ghost">Trimite mesaj</a>
+    <section class="section">
+      <div class="container-x">
+        <div class="relative overflow-hidden rounded-4xl shadow-card" appReveal="scale">
+          <img [src]="bg" alt="Petrecere cu lumini" class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+          <div class="absolute inset-0 bg-gradient-to-r from-sage-700/90 via-sage-700/70 to-sage-600/50"></div>
+          <div class="relative px-7 py-16 text-center text-cream-50 sm:px-12 sm:py-24">
+            <p class="script text-3xl !text-gold-200 sm:text-4xl">Hai să ne cunoaștem</p>
+            <h2 class="mx-auto mt-3 max-w-2xl font-display text-4xl text-cream-50 sm:text-5xl">
+              Rezervă o vizită la locația de pe lac
+            </h2>
+            <p class="mx-auto mt-5 max-w-xl text-cream-100/85">
+              Spune-ne data și detaliile evenimentului tău, iar noi îți pregătim o ofertă personalizată.
+            </p>
+            <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <a routerLink="/rezervari" class="btn btn-gold w-full sm:w-auto">Verifică disponibilitatea</a>
+              <a routerLink="/contact" class="btn btn-outline w-full !border-cream-100/60 !text-cream-50 hover:!bg-cream-50/10 sm:w-auto">
+                Contactează-ne
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   `
 })
-export class CtaSectionComponent {}
+export class CtaSectionComponent {
+  readonly bg = IMAGES.stringLights;
+}

@@ -1,57 +1,42 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
 import { BookingService } from '../../../core/services/booking.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { AdminStats, AvailabilityStatus, Booking, BookingStatus } from '../../../core/models/api.models';
+import { AdminStats, AvailabilityStatus, Booking, BookingStatus, DayStatus } from '../../../core/models/api.models';
 import { AvailabilityCalendarComponent } from '../../booking/components/availability-calendar.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, AvailabilityCalendarComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [AvailabilityCalendarComponent],
   template: `
-    <section class="pt-32 pb-12">
-      <div class="container-luxe px-6 flex flex-wrap items-end justify-between gap-4">
+    <section class="container-x pb-16 pt-28 sm:pt-32">
+      <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span class="eyebrow">Admin</span>
-          <h1 class="mt-3 font-display text-4xl md:text-5xl text-white">Panou de <span class="gold-text">control</span></h1>
+          <p class="eyebrow">Administrare</p>
+          <h1 class="mt-3 font-display text-4xl text-ink-900 sm:text-5xl">Panou de <span class="gold-text">control</span></h1>
         </div>
-        <button (click)="logout()" class="btn btn-ghost">Logout</button>
+        <button (click)="logout()" class="btn btn-outline">Deconectare</button>
       </div>
-    </section>
 
-    <section class="pb-10">
-      <div class="container-luxe px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="glass rounded-2xl p-6">
-          <p class="eyebrow text-[10px]">Rezervări total</p>
-          <p class="font-display text-4xl gold-text mt-2">{{ stats()?.bookings?.total ?? 0 }}</p>
-        </div>
-        <div class="glass rounded-2xl p-6">
-          <p class="eyebrow text-[10px]">În așteptare</p>
-          <p class="font-display text-4xl text-amber-300 mt-2">{{ stats()?.bookings?.pending ?? 0 }}</p>
-        </div>
-        <div class="glass rounded-2xl p-6">
-          <p class="eyebrow text-[10px]">Confirmate</p>
-          <p class="font-display text-4xl text-emerald-300 mt-2">{{ stats()?.bookings?.confirmed ?? 0 }}</p>
-        </div>
-        <div class="glass rounded-2xl p-6">
-          <p class="eyebrow text-[10px]">Mesaje necitite</p>
-          <p class="font-display text-4xl text-lake-300 mt-2">{{ stats()?.messages?.unread ?? 0 }}</p>
-        </div>
+      <!-- Stats -->
+      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        @for (s of statCards(); track s.label) {
+          <div class="card p-6">
+            <p class="text-xs uppercase tracking-widest2 text-ink-500">{{ s.label }}</p>
+            <p class="mt-2 font-display text-4xl" [class]="s.color">{{ s.value }}</p>
+          </div>
+        }
       </div>
-    </section>
 
-    <section class="pb-20">
-      <div class="container-luxe px-6 grid lg:grid-cols-3 gap-8">
-        <!-- Bookings list -->
-        <div class="lg:col-span-2 glass rounded-3xl p-7">
-          <div class="flex items-center justify-between mb-5">
-            <h2 class="font-display text-2xl text-white">Cereri rezervări</h2>
+      <div class="mt-10 grid gap-8 lg:grid-cols-3">
+        <!-- Bookings -->
+        <div class="card p-6 sm:p-7 lg:col-span-2">
+          <div class="mb-5 flex items-center justify-between">
+            <h2 class="font-display text-2xl text-ink-900">Cereri rezervări</h2>
             <select [value]="filter()" (change)="onFilter($event)"
-                    class="bg-ink-900/70 border border-white/10 rounded-xl px-3 py-2 text-sm text-white/80 outline-none focus:border-gold-400">
+                    class="rounded-xl border border-cream-400 bg-cream-50 px-3 py-2 text-sm text-ink-700 outline-none focus:border-gold-400">
               <option value="">Toate</option>
               <option value="pending">În așteptare</option>
               <option value="confirmed">Confirmate</option>
@@ -60,46 +45,63 @@ import { AvailabilityCalendarComponent } from '../../booking/components/availabi
             </select>
           </div>
 
-          <div class="space-y-3 max-h-[640px] overflow-y-auto pr-2">
-            <article *ngFor="let b of bookings()" class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 hover:border-gold-400/30 transition">
-              <div class="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p class="font-display text-xl text-white">{{ b.full_name }} <span class="text-white/40 text-sm">· {{ b.event_type }}</span></p>
-                  <p class="text-xs text-white/55 mt-1">{{ b.email }} · {{ b.phone }}</p>
+          <div class="max-h-[640px] space-y-3 overflow-y-auto pr-1">
+            @for (b of bookings(); track b.id) {
+              <article class="rounded-2xl border border-cream-300 bg-cream-100 p-5 transition hover:border-gold-300">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-display text-xl text-ink-900">{{ b.full_name }}
+                      <span class="text-sm text-ink-400">· {{ b.event_type }}</span></p>
+                    <p class="mt-1 text-xs text-ink-500">{{ b.email }} · {{ b.phone }}</p>
+                  </div>
+                  <span class="rounded-full px-3 py-1 text-xs uppercase tracking-wider" [class]="statusClass(b.status)">{{ b.status }}</span>
                 </div>
-                <span class="text-xs uppercase tracking-widest px-3 py-1 rounded-full"
-                      [ngClass]="statusClass(b.status)">{{ b.status }}</span>
-              </div>
-              <div class="mt-3 flex flex-wrap gap-5 text-sm text-white/75">
-                <span><span class="text-white/40">Data:</span> {{ b.event_date }}</span>
-                <span><span class="text-white/40">Invitați:</span> {{ b.guests }}</span>
-              </div>
-              <p *ngIf="b.message" class="mt-3 text-sm text-white/65 italic">„{{ b.message }}”</p>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <button *ngIf="b.status !== 'confirmed'" (click)="setStatus(b, 'confirmed')" class="text-xs px-3 py-1.5 rounded-full bg-emerald-400/15 border border-emerald-400/30 text-emerald-200 hover:bg-emerald-400/25 transition">Confirmă</button>
-                <button *ngIf="b.status !== 'pending'" (click)="setStatus(b, 'pending')" class="text-xs px-3 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-200 hover:bg-amber-400/25 transition">În așteptare</button>
-                <button *ngIf="b.status !== 'rejected'" (click)="setStatus(b, 'rejected')" class="text-xs px-3 py-1.5 rounded-full bg-rose-400/15 border border-rose-400/30 text-rose-200 hover:bg-rose-400/25 transition">Refuză</button>
-                <button (click)="remove(b)" class="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition">Șterge</button>
-              </div>
-            </article>
-            <p *ngIf="!bookings().length" class="text-white/50 text-sm">Nu există cereri.</p>
+                <div class="mt-3 flex flex-wrap gap-5 text-sm text-ink-600">
+                  <span><span class="text-ink-400">Data:</span> {{ b.event_date }}</span>
+                  <span><span class="text-ink-400">Invitați:</span> {{ b.guests }}</span>
+                </div>
+                @if (b.message) { <p class="mt-3 text-sm italic text-ink-500">„{{ b.message }}”</p> }
+                <div class="mt-4 flex flex-wrap gap-2">
+                  @if (b.status !== 'confirmed') {
+                    <button (click)="setStatus(b, 'confirmed')" class="rounded-full bg-sage-100 px-3 py-1.5 text-xs text-sage-600 transition hover:bg-sage-200">Confirmă</button>
+                  }
+                  @if (b.status !== 'pending') {
+                    <button (click)="setStatus(b, 'pending')" class="rounded-full bg-gold-100 px-3 py-1.5 text-xs text-gold-700 transition hover:bg-gold-200">În așteptare</button>
+                  }
+                  @if (b.status !== 'rejected') {
+                    <button (click)="setStatus(b, 'rejected')" class="rounded-full bg-blush-100 px-3 py-1.5 text-xs text-blush-400 transition hover:bg-blush-200">Refuză</button>
+                  }
+                  <button (click)="remove(b)" class="rounded-full border border-cream-400 px-3 py-1.5 text-xs text-ink-500 transition hover:border-ink-400 hover:text-ink-700">Șterge</button>
+                </div>
+              </article>
+            }
+            @if (!bookings().length) { <p class="py-6 text-center text-sm text-ink-500">Nu există cereri.</p> }
           </div>
         </div>
 
         <!-- Calendar control -->
-        <aside class="lg:col-span-1 space-y-5">
-          <app-availability-calendar (dateSelected)="onPickDate($event)"></app-availability-calendar>
-
-          <div class="glass rounded-2xl p-6" *ngIf="pickedDate()">
-            <p class="eyebrow text-[10px] text-gold-300">Dată selectată</p>
-            <p class="font-display text-2xl text-white mt-1">{{ pickedDate() }}</p>
-            <div class="mt-4 grid grid-cols-2 gap-2">
-              <button (click)="overrideStatus('blocked')" class="text-xs px-3 py-2 rounded-lg border border-white/10 hover:border-gold-400/40">Blochează</button>
-              <button (click)="overrideStatus('booked')" class="text-xs px-3 py-2 rounded-lg border border-rose-400/30 text-rose-200 hover:bg-rose-400/10">Marchează rezervat</button>
-              <button (click)="overrideStatus('pending')" class="text-xs px-3 py-2 rounded-lg border border-amber-400/30 text-amber-200 hover:bg-amber-400/10">În așteptare</button>
-              <button (click)="overrideStatus('available')" class="text-xs px-3 py-2 rounded-lg border border-emerald-400/30 text-emerald-200 hover:bg-emerald-400/10">Eliberează</button>
-            </div>
+        <aside class="space-y-5">
+          <div class="card p-6">
+            <h2 class="mb-4 font-display text-2xl text-ink-900">Calendar</h2>
+            <app-availability-calendar
+              [days]="days()"
+              [selected]="pickedDate()"
+              (daySelected)="pickedDate.set($event)"
+              (monthChanged)="loadMonth($event)" />
           </div>
+
+          @if (pickedDate()) {
+            <div class="card p-6">
+              <p class="text-xs uppercase tracking-widest2 text-gold-600">Dată selectată</p>
+              <p class="mt-1 font-display text-2xl text-ink-900">{{ pickedDate() }}</p>
+              <div class="mt-4 grid grid-cols-2 gap-2">
+                <button (click)="overrideStatus('available')" class="rounded-lg border border-sage-200 px-3 py-2 text-xs text-sage-600 hover:bg-sage-50">Eliberează</button>
+                <button (click)="overrideStatus('pending')" class="rounded-lg border border-gold-200 px-3 py-2 text-xs text-gold-700 hover:bg-gold-50">În așteptare</button>
+                <button (click)="overrideStatus('booked')" class="rounded-lg border border-blush-200 px-3 py-2 text-xs text-blush-400 hover:bg-blush-50">Rezervat</button>
+                <button (click)="overrideStatus('blocked')" class="rounded-lg border border-cream-400 px-3 py-2 text-xs text-ink-600 hover:bg-cream-200">Blochează</button>
+              </div>
+            </div>
+          }
         </aside>
       </div>
     </section>
@@ -115,8 +117,23 @@ export class AdminDashboardComponent implements OnInit {
   readonly bookings = signal<Booking[]>([]);
   readonly filter = signal<BookingStatus | ''>('');
   readonly pickedDate = signal<string | null>(null);
+  readonly days = signal<DayStatus[]>([]);
+  private currentRange = this.monthRange(new Date());
 
-  ngOnInit(): void { this.refresh(); }
+  readonly statCards = () => {
+    const s = this.stats();
+    return [
+      { label: 'Rezervări total', value: s?.bookings.total ?? 0, color: 'gold-text' },
+      { label: 'În așteptare', value: s?.bookings.pending ?? 0, color: 'text-gold-600' },
+      { label: 'Confirmate', value: s?.bookings.confirmed ?? 0, color: 'text-sage-500' },
+      { label: 'Mesaje necitite', value: s?.messages.unread ?? 0, color: 'text-lake-400' }
+    ];
+  };
+
+  ngOnInit(): void {
+    this.refresh();
+    this.loadMonth(this.currentRange);
+  }
 
   refresh(): void {
     this.admin.getStats().subscribe({ next: (s) => this.stats.set(s), error: () => {} });
@@ -127,6 +144,14 @@ export class AdminDashboardComponent implements OnInit {
     this.bookingSvc.listBookings(this.filter() || undefined).subscribe({
       next: (rows) => this.bookings.set(rows),
       error: () => this.bookings.set([])
+    });
+  }
+
+  loadMonth(range: { start: string; end: string }): void {
+    this.currentRange = range;
+    this.bookingSvc.getCalendar(range.start, range.end).subscribe({
+      next: (res) => this.days.set(res.days),
+      error: () => this.days.set([])
     });
   }
 
@@ -144,25 +169,29 @@ export class AdminDashboardComponent implements OnInit {
     this.bookingSvc.deleteBooking(b.id).subscribe(() => this.refresh());
   }
 
-  onPickDate(iso: string): void { this.pickedDate.set(iso); }
-
   overrideStatus(status: AvailabilityStatus): void {
     const day = this.pickedDate();
     if (!day) return;
+    const done = () => { this.refresh(); this.loadMonth(this.currentRange); };
     if (status === 'available') {
-      this.bookingSvc.clearAvailability(day).subscribe(() => this.refresh());
+      this.bookingSvc.clearAvailability(day).subscribe(done);
     } else {
-      this.bookingSvc.upsertAvailability(day, status).subscribe(() => this.refresh());
+      this.bookingSvc.upsertAvailability(day, status).subscribe(done);
     }
   }
 
   statusClass(s: BookingStatus): string {
     return ({
-      pending:   'bg-amber-400/15 text-amber-200 border border-amber-400/30',
-      confirmed: 'bg-emerald-400/15 text-emerald-200 border border-emerald-400/30',
-      rejected:  'bg-rose-400/15 text-rose-200 border border-rose-400/30',
-      cancelled: 'bg-white/10 text-white/60 border border-white/15'
+      pending:   'bg-gold-100 text-gold-700',
+      confirmed: 'bg-sage-100 text-sage-600',
+      rejected:  'bg-blush-100 text-blush-400',
+      cancelled: 'bg-cream-300 text-ink-500'
     } as Record<BookingStatus, string>)[s];
+  }
+
+  private monthRange(d: Date): { start: string; end: string } {
+    const iso = (x: Date) => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
+    return { start: iso(new Date(d.getFullYear(), d.getMonth(), 1)), end: iso(new Date(d.getFullYear(), d.getMonth() + 1, 0)) };
   }
 
   logout(): void { this.auth.logout(); this.router.navigateByUrl('/admin/login'); }

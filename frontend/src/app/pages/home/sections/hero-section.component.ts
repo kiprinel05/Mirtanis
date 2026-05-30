@@ -1,87 +1,141 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, effect, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { IMAGES } from '../../../shared/data/images';
+import { AppStateService } from '../../../core/services/app-state.service';
 
 @Component({
   selector: 'app-hero-section',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink],
   template: `
-    <section class="relative h-[100svh] min-h-[680px] w-full overflow-hidden">
-      <!-- Cinematic video background -->
-      <video #vid class="absolute inset-0 w-full h-full object-cover scale-105 will-change-transform"
-             autoplay muted loop playsinline preload="metadata"
-             poster="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=80">
-        <source src="https://cdn.coverr.co/videos/coverr-a-quiet-lake-at-dusk-4801/1080p.mp4" type="video/mp4"/>
-      </video>
+    <section class="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
+      <!-- Background image with slow ken-burns -->
+      <div class="absolute inset-0">
+        <img [src]="hero" alt="Locație de nuntă pe malul lacului Mirtanis"
+             class="h-full w-full animate-ken-burns object-cover" fetchpriority="high" />
+        <!-- Layered scrims: top (for navbar), bottom fade, and a centred focus glow -->
+        <div class="absolute inset-0 bg-gradient-to-b from-cream-50/45 via-transparent to-cream-100/95"></div>
+        <div class="absolute inset-0"
+             style="background: radial-gradient(58% 50% at 50% 46%, rgba(40,30,16,0.40) 0%, rgba(40,30,16,0.18) 38%, rgba(40,30,16,0) 70%);"></div>
+      </div>
 
-      <!-- Layered gradients -->
-      <div class="absolute inset-0 bg-gradient-to-b from-ink-950/60 via-ink-950/40 to-ink-950"></div>
-      <div class="absolute inset-0 bg-lux-radial"></div>
-      <div class="absolute inset-0 bg-lux-vignette"></div>
-
-      <!-- Floating particles -->
-      <div class="particles">
-        <span class="particle" style="top:18%;left:12%;animation-delay:0s"></span>
-        <span class="particle" style="top:32%;left:78%;animation-delay:1.5s"></span>
-        <span class="particle" style="top:60%;left:22%;animation-delay:3s;width:4px;height:4px"></span>
-        <span class="particle" style="top:75%;left:60%;animation-delay:4.2s;width:8px;height:8px"></span>
-        <span class="particle" style="top:46%;left:50%;animation-delay:2s"></span>
-        <span class="particle" style="top:84%;left:88%;animation-delay:6s"></span>
+      <!-- Floating petals -->
+      <div class="pointer-events-none absolute inset-0 overflow-hidden">
+        @for (p of petals; track $index) {
+          <span class="petal" [style.left.%]="p.l" [style.animation-delay.s]="p.d" [style.animation-duration.s]="p.dur"></span>
+        }
       </div>
 
       <!-- Content -->
-      <div class="relative z-10 h-full container-luxe px-6 flex flex-col justify-end pb-32 md:pb-40">
-        <span #eyebrow class="eyebrow opacity-0">Mirtanis Events · Locație pe lac</span>
-
-        <h1 #title class="mt-6 font-display font-light text-white text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.02] tracking-tight max-w-5xl">
-          <span class="block opacity-0" data-line>Transformăm momentele speciale</span>
-          <span class="block gold-text opacity-0" data-line>în amintiri de neuitat.</span>
+      <div #content class="container-x relative z-10 text-center" style="text-shadow: 0 2px 30px rgba(30,22,10,0.35);">
+        <p class="hero-line script text-3xl text-gold-100 sm:text-4xl">Bine ați venit la</p>
+        <h1 class="hero-line mt-3 font-display text-6xl font-semibold leading-[1.0] text-cream-50 sm:text-7xl lg:text-[7.5rem]">
+          Mirtanis <span class="gold-text-bright gold-shimmer">Events</span>
         </h1>
-
-        <p #sub class="mt-8 max-w-2xl text-lg md:text-xl text-white/75 leading-relaxed opacity-0">
-          O locație de poveste, în mijlocul unui lac superb — cort premium, sală elegantă,
-          pontoane romantice și o atmosferă creată pentru evenimentul perfect.
+        <div class="hero-line mx-auto mt-6 flex max-w-md items-center justify-center gap-4 text-cream-50/90">
+          <span class="h-px w-10 bg-cream-50/50"></span>
+          <span class="text-xs uppercase tracking-widest2">Locație de poveste pe lac</span>
+          <span class="h-px w-10 bg-cream-50/50"></span>
+        </div>
+        <p class="hero-line mx-auto mt-6 max-w-xl text-balance text-base text-cream-50/90 sm:text-lg">
+          Nunți, botezuri și evenimente private pe malul lacului — un decor de poveste,
+          cu lumină caldă, apă liniștită și amintiri care rămân.
         </p>
-
-        <div #cta class="mt-10 flex flex-wrap gap-4 opacity-0">
-          <a routerLink="/rezervari" class="btn btn-primary">Verifică disponibilitatea</a>
-          <a routerLink="/contact" class="btn btn-ghost">Programează o vizită</a>
+        <div class="hero-line mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <a routerLink="/rezervari" class="btn btn-gold w-full sm:w-auto">Verifică disponibilitatea</a>
+          <a routerLink="/galerie" class="btn btn-hero-ghost w-full sm:w-auto">Descoperă galeria</a>
         </div>
       </div>
 
-      <!-- Scroll indicator -->
-      <div class="absolute bottom-8 inset-x-0 z-10 flex flex-col items-center gap-3 text-white/60">
-        <span class="eyebrow text-[10px]">scroll</span>
-        <span class="relative block h-12 w-px bg-white/20 overflow-hidden">
-          <span class="absolute inset-x-0 top-0 h-4 bg-gold-400 animate-[shimmer_2s_ease-in-out_infinite]"></span>
-        </span>
+      <!-- Scroll cue -->
+      <div class="absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
+        <div class="flex flex-col items-center gap-2 text-cream-50/80">
+          <span class="text-[10px] uppercase tracking-widest2">Derulează</span>
+          <span class="scroll-cue"></span>
+        </div>
       </div>
     </section>
-  `
+  `,
+  styles: [`
+    .hero-line { opacity: 0; }
+
+    /* brighter gold gradient that pops on the darker scrim */
+    :host ::ng-deep .gold-text-bright {
+      background: linear-gradient(120deg, #e9c97a 0%, #f6e7b8 45%, #d8af55 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .btn-hero-ghost {
+      border: 1px solid rgba(255,255,255,.7);
+      color: #fff; background: rgba(255,255,255,.08);
+      backdrop-filter: blur(4px);
+    }
+    .btn-hero-ghost:hover { background: rgba(255,255,255,.18); transform: translateY(-2px); }
+
+    .petal {
+      position: absolute; top: -5%;
+      width: 12px; height: 12px; border-radius: 0 60% 0 60%;
+      background: rgba(255, 240, 205, .55);
+      animation-name: petal-fall; animation-timing-function: linear; animation-iteration-count: infinite;
+    }
+    @keyframes petal-fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: .8; }
+      100% { transform: translateY(108vh) rotate(420deg); opacity: 0; }
+    }
+
+    .scroll-cue {
+      position: relative; display: block; width: 22px; height: 36px;
+      border: 1px solid rgba(255,255,255,.7); border-radius: 999px;
+    }
+    .scroll-cue::after {
+      content: ''; position: absolute; left: 50%; top: 7px;
+      width: 4px; height: 8px; margin-left: -2px; border-radius: 999px; background: #fff;
+      animation: scroll-dot 1.6s ease-in-out infinite;
+    }
+    @keyframes scroll-dot {
+      0% { transform: translateY(0); opacity: 0; }
+      30% { opacity: 1; }
+      60% { transform: translateY(12px); opacity: 0; }
+      100% { transform: translateY(12px); opacity: 0; }
+    }
+  `]
 })
 export class HeroSectionComponent implements AfterViewInit {
-  @ViewChild('title') title!: ElementRef<HTMLElement>;
-  @ViewChild('sub') sub!: ElementRef<HTMLElement>;
-  @ViewChild('cta') cta!: ElementRef<HTMLElement>;
-  @ViewChild('eyebrow') eyebrow!: ElementRef<HTMLElement>;
+  private readonly appState = inject(AppStateService);
+  private readonly content = viewChild<ElementRef<HTMLElement>>('content');
+  private viewReady = false;
 
-  async ngAfterViewInit(): Promise<void> {
-    if (typeof window === 'undefined') return;
-    try {
-      const anime = (await import('animejs')).default;
-      const lines = this.title.nativeElement.querySelectorAll<HTMLElement>('[data-line]');
+  readonly hero = IMAGES.heroLake;
+  readonly petals = Array.from({ length: 16 }, () => ({
+    l: Math.round(Math.random() * 100),
+    d: +(Math.random() * 8).toFixed(1),
+    dur: +(9 + Math.random() * 8).toFixed(1)
+  }));
 
-      anime.timeline({ easing: 'cubicBezier(.16,1,.3,1)' })
-        .add({ targets: this.eyebrow.nativeElement, opacity: [0, 1], translateY: [12, 0], duration: 900 })
-        .add({ targets: lines, opacity: [0, 1], translateY: [60, 0], duration: 1400, delay: anime.stagger(180) }, '-=600')
-        .add({ targets: this.sub.nativeElement, opacity: [0, 1], translateY: [30, 0], duration: 1100 }, '-=900')
-        .add({ targets: this.cta.nativeElement, opacity: [0, 1], translateY: [20, 0], duration: 900 }, '-=700');
-    } catch {
-      // graceful: just reveal
-      [this.eyebrow, this.title, this.sub, this.cta].forEach((r) => (r.nativeElement.style.opacity = '1'));
-      this.title.nativeElement.querySelectorAll<HTMLElement>('[data-line]').forEach((l) => (l.style.opacity = '1'));
-    }
+  constructor() {
+    effect(() => {
+      if (this.appState.ready() && this.viewReady) this.play();
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    if (this.appState.ready()) this.play();
+  }
+
+  private play(): void {
+    const root = this.content()?.nativeElement;
+    if (!root) return;
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('.hero-line'));
+    lines.forEach((el, i) => {
+      el.animate(
+        [
+          { opacity: 0, transform: 'translateY(40px)', filter: 'blur(6px)' },
+          { opacity: 1, transform: 'translateY(0)', filter: 'blur(0)' }
+        ],
+        { duration: 1000, delay: 200 + i * 130, easing: 'cubic-bezier(0.22,1,0.36,1)', fill: 'both' }
+      );
+    });
   }
 }
