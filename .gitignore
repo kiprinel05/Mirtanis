@@ -1,0 +1,17 @@
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+.env
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# --- Node / Angular ---
+node_modules/
+dist/
+.angular/
+
+# --- Editors ---
+.vscode/
+.idea/
+.DS_Store
