@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { AppStateService } from '../../core/services/app-state.service';
+import { dismissBootLoader } from '../boot-loader';
 
 /**
  * Elegant intro loader: a gold ring draws itself around the Mirtanis monogram,
@@ -63,6 +64,10 @@ export class LoaderComponent implements OnInit {
   readonly leaving = signal(false);
 
   ngOnInit(): void {
+    // The Angular curtain already covers the screen, so drop the static boot
+    // loader underneath it right away (it's hidden — no flash).
+    dismissBootLoader();
+
     const MIN_MS = 1300;
     const start = performance.now();
 
@@ -71,7 +76,6 @@ export class LoaderComponent implements OnInit {
       setTimeout(() => {
         this.leaving.set(true);
         this.appState.ready.set(true);          // hero entrance fires now
-        document.getElementById('boot-loader')?.remove();
         setTimeout(() => this.visible.set(false), 900);
       }, wait);
     };

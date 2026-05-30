@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { IMAGES } from "../../shared/data/images";
+import { Component, AfterViewInit } from "@angular/core";
+import { dismissBootLoader } from "../../shared/boot-loader";
 
 @Component({
   selector: "app-coming-soon",
@@ -47,36 +47,37 @@ import { IMAGES } from "../../shared/data/images";
         class="relative z-10 flex flex-1 flex-col items-center justify-center px-6"
         style="text-shadow: 0 2px 30px rgba(0,0,0,.5);"
       >
+        <div class="relative cs-line" style="animation-delay:.45s">
+          <span class="logo-halo"></span>
+          <img
+            src="/logo-gold.png"
+            alt="Mirtanis Events"
+            class="relative w-[300px] max-w-[80vw] sm:w-[420px]"
+            style="filter: drop-shadow(0 8px 26px rgba(0,0,0,.45));"
+          />
+        </div>
+
         <div
-          class="cs-line mb-7 flex items-center gap-4"
-          style="animation-delay:.45s"
+          class="cs-line mt-6 flex items-center gap-4"
+          style="animation-delay:.55s"
         >
           <span class="div-rule"></span>
           <span class="div-diamond"></span>
           <span class="div-rule div-rule--flip"></span>
         </div>
 
-        <p
-          class="cs-line script text-3xl text-gold-200 sm:text-4xl"
-          style="animation-delay:.55s"
-        >
-          Mirtanis Events
-        </p>
-
         <h1
-          class="cs-line mt-3 max-w-3xl font-display text-[2.5rem] leading-[1.05] text-cream-50 sm:text-6xl lg:text-7xl"
+          class="cs-line mt-8 max-w-3xl font-display text-[2.5rem] leading-[1.05] text-cream-50 sm:text-6xl lg:text-7xl"
           style="animation-delay:.7s"
         >
-          Locația voastră preferată<br />
-          <span class="gold-strong">este în curs de pregătire</span>
+          <span class="gold-strong">Povestea continuă în curând</span>
         </h1>
 
         <p
-          class="cs-line mt-6 max-w-md text-sm text-cream-50/80 sm:text-base"
+          class="cs-line mt-6 max-w-md text-base text-cream-50/85 sm:text-lg"
           style="animation-delay:.85s"
         >
-          Pregătim un loc de poveste pentru momentele voastre speciale. Revenim
-          curând.
+          Noul nostru website este în pregătire.
         </p>
       </div>
 
@@ -294,8 +295,8 @@ import { IMAGES } from "../../shared/data/images";
     `,
   ],
 })
-export class ComingSoonComponent implements OnInit {
-  readonly bg = IMAGES.storyCouple;
+export class ComingSoonComponent implements AfterViewInit {
+  readonly bg = '/img.jpg';
 
   // TODO: replace with the real social profiles
   readonly social = {
@@ -311,7 +312,14 @@ export class ComingSoonComponent implements OnInit {
     o: +(0.3 + Math.random() * 0.45).toFixed(2),
   }));
 
-  ngOnInit(): void {
-    document.getElementById("boot-loader")?.remove();
+  ngAfterViewInit(): void {
+    // Keep the (identical, dark) boot loader visible until the cinematic
+    // background has actually loaded, then crossfade — no white flash, no jump.
+    const img = new Image();
+    img.onload = () => dismissBootLoader();
+    img.onerror = () => dismissBootLoader();
+    img.src = this.bg;
+    // Safety net if the image hangs on a very poor connection.
+    window.setTimeout(() => dismissBootLoader(), 2500);
   }
 }
