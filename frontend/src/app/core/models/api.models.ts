@@ -11,12 +11,14 @@ export type EventType =
 export type BookingStatus = 'pending' | 'confirmed' | 'rejected' | 'cancelled';
 export type AvailabilityStatus = 'available' | 'pending' | 'booked' | 'blocked';
 export type GalleryCategory = 'nunti' | 'botezuri' | 'petreceri' | 'exterior' | 'lac' | 'cort' | 'sala';
+export type Venue = 'cort' | 'sala';
 
 export interface BookingRequest {
   full_name: string;
   phone: string;
   email: string;
   event_type: EventType;
+  venue: Venue;
   guests: number;
   event_date: string; // YYYY-MM-DD
   message?: string;

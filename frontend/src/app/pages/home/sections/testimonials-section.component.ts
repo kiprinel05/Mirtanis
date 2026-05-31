@@ -21,7 +21,7 @@ interface Review { quote: string; opener: string; name: string; meta: string; in
 
           <div class="mt-7 inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-full border border-cream-50/20 bg-cream-50/10 px-6 py-3 backdrop-blur-sm">
             <span class="flex items-center gap-0.5 text-gold-200" aria-label="5 din 5 stele">
-              @for (s of stars; track $index) { <span>★</span> }
+              @for (s of stars; track $index) { <span class="mi fill text-[18px]">star</span> }
             </span>
             <span class="text-sm font-semibold">98% recomandă</span>
             <span class="hidden h-4 w-px bg-cream-50/30 sm:block"></span>
@@ -34,11 +34,11 @@ interface Review { quote: string; opener: string; name: string; meta: string; in
 
         <div class="mt-14 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-stretch">
           <!-- Featured card -->
-          <article class="relative flex flex-col rounded-4xl bg-cream-50 p-8 text-ink-700 shadow-card sm:p-10" appReveal="left">
+          <article class="relative flex min-h-[26rem] flex-col rounded-4xl bg-cream-50 p-8 text-ink-700 shadow-card sm:min-h-[24rem] sm:p-10" appReveal="up">
             <span class="pointer-events-none absolute right-8 top-4 font-display text-8xl leading-none text-gold-200">”</span>
 
-            <div class="flex items-center gap-1 text-gold-500">
-              @for (s of stars; track $index) { <span>★</span> }
+            <div class="flex items-center gap-0.5 text-gold-500">
+              @for (s of stars; track $index) { <span class="mi fill text-[20px]">star</span> }
             </div>
 
             <!-- short italic opener, then clean body -->
@@ -55,9 +55,9 @@ interface Review { quote: string; opener: string; name: string; meta: string; in
               </div>
               <div class="flex gap-2">
                 <button (click)="prev()" aria-label="Anterioara"
-                        class="grid h-10 w-10 place-items-center rounded-full border border-cream-400 text-ink-700 transition hover:border-gold-400 hover:text-gold-600">‹</button>
+                        class="grid h-10 w-10 place-items-center rounded-full border border-cream-400 text-ink-700 transition hover:border-gold-400 hover:text-gold-600"><span class="mi text-[22px]">chevron_left</span></button>
                 <button (click)="next()" aria-label="Următoarea"
-                        class="grid h-10 w-10 place-items-center rounded-full border border-cream-400 text-ink-700 transition hover:border-gold-400 hover:text-gold-600">›</button>
+                        class="grid h-10 w-10 place-items-center rounded-full border border-cream-400 text-ink-700 transition hover:border-gold-400 hover:text-gold-600"><span class="mi text-[22px]">chevron_right</span></button>
               </div>
             </div>
           </article>
@@ -66,8 +66,8 @@ interface Review { quote: string; opener: string; name: string; meta: string; in
           <div class="grid gap-4" appReveal="right" [revealStagger]="90">
             @for (r of shorts; track r.name) {
               <div class="rounded-3xl border border-cream-50/15 bg-cream-50/10 p-6 backdrop-blur-sm transition-colors hover:bg-cream-50/15">
-                <div class="flex items-center gap-1 text-gold-200">
-                  @for (s of stars; track $index) { <span class="text-sm">★</span> }
+                <div class="flex items-center gap-0.5 text-gold-200">
+                  @for (s of stars; track $index) { <span class="mi fill text-[16px]">star</span> }
                 </div>
                 <p class="mt-3 text-cream-50">{{ r.quote }}</p>
                 <div class="mt-4 flex items-center gap-3">

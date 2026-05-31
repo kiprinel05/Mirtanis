@@ -4,47 +4,34 @@
 
 [33m❯[39m Building...
 [32m✔[39m Building...
-Application bundle generation failed. [3.401 seconds]
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m                    [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-5AHYYLUN.js[39m    [2m | [22m[2m-[22m                        [2m | [22m[36m152.89 kB[39m[2m | [22m               [36m44.84 kB[39m
+[32mchunk-WUUZWR7D.js[39m    [2m | [22m[2m-[22m                        [2m | [22m [36m85.88 kB[39m[2m | [22m               [36m21.69 kB[39m
+[32mmain-QTUC7ITT.js[39m     [2m | [22m[2mmain[22m                     [2m | [22m [36m84.49 kB[39m[2m | [22m               [36m22.90 kB[39m
+[32mstyles-7E7HIPFU.css[39m  [2m | [22m[2mstyles[22m                   [2m | [22m [36m43.13 kB[39m[2m | [22m                [36m7.10 kB[39m
+[32mpolyfills-5CFQRCPP.js[39m[2m | [22m[2mpolyfills[22m                [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.33 kB[39m
+[32mchunk-2WRMOSOX.js[39m    [2m | [22m[2m-[22m                        [2m | [22m  [36m6.49 kB[39m[2m | [22m                [36m1.90 kB[39m
+[32mchunk-IX32K7SJ.js[39m    [2m | [22m[2m-[22m                        [2m | [22m[36m745 bytes[39m[2m | [22m              [36m745 bytes[39m
+[32mchunk-XA2I3NUG.js[39m    [2m | [22m[2m-[22m                        [2m | [22m[36m237 bytes[39m[2m | [22m              [36m237 bytes[39m
+[32mchunk-3AIDPLC7.js[39m    [2m | [22m[2m-[22m                        [2m | [22m [36m83 bytes[39m[2m | [22m               [36m83 bytes[39m
 
-[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mTS-998113: All imports are unused[0m [1m[35m[plugin angular-compiler][0m
+[1m [22m                    [2m | [22m[1mInitial total[22m            [2m | [22m[1m408.53 kB[22m[2m | [22m              [1m110.83 kB[22m
 
-    src/app/pages/home/sections/testimonials-section.component.ts:9:2:
-[37m      9 │   [32mimports[37m: [RevealDirective],
-        ╵   [32m~~~~~~~[0m
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m                    [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-Z4VBAKSG.js[39m    [2m | [22m[2m-[22m                        [2m | [22m [36m35.36 kB[39m[2m | [22m                [36m7.64 kB[39m
+[32mchunk-LYCO27OT.js[39m    [2m | [22m[2mhome-component[22m           [2m | [22m [36m30.05 kB[39m[2m | [22m                [36m8.12 kB[39m
+[32mchunk-QLK6HVCR.js[39m    [2m | [22m[2mbooking-component[22m        [2m | [22m [36m11.94 kB[39m[2m | [22m                [36m3.74 kB[39m
+[32mchunk-GVKBZYRX.js[39m    [2m | [22m[2madmin-dashboard-component[22m[2m | [22m [36m10.46 kB[39m[2m | [22m                [36m3.04 kB[39m
+[32mchunk-5KTD2R53.js[39m    [2m | [22m[2mgallery-component[22m        [2m | [22m  [36m7.14 kB[39m[2m | [22m                [36m2.48 kB[39m
+[32mchunk-3ELDJWXZ.js[39m    [2m | [22m[2mcontact-component[22m        [2m | [22m  [36m6.55 kB[39m[2m | [22m                [36m2.56 kB[39m
+[32mchunk-IHCGAZJL.js[39m    [2m | [22m[2m-[22m                        [2m | [22m  [36m5.98 kB[39m[2m | [22m                [36m2.11 kB[39m
+[32mchunk-F3HBEB4K.js[39m    [2m | [22m[2mlocations-component[22m      [2m | [22m  [36m4.65 kB[39m[2m | [22m                [36m1.96 kB[39m
+[32mchunk-OWNJPY6G.js[39m    [2m | [22m[2madmin-login-component[22m    [2m | [22m  [36m3.23 kB[39m[2m | [22m                [36m1.44 kB[39m
+[32mchunk-ZKAIIUTH.js[39m    [2m | [22m[2m-[22m                        [2m | [22m  [36m2.02 kB[39m[2m | [22m              [36m899 bytes[39m
+[32mchunk-OBUMUJFA.js[39m    [2m | [22m[2m-[22m                        [2m | [22m  [36m1.80 kB[39m[2m | [22m              [36m721 bytes[39m
+[32mchunk-YWWUAFTO.js[39m    [2m | [22m[2m-[22m                        [2m | [22m  [36m1.43 kB[39m[2m | [22m              [36m536 bytes[39m
 
+Application bundle generation complete. [5.303 seconds]
 
-[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mTS-998113: All imports are unused[0m [1m[35m[plugin angular-compiler][0m
+Output location: C:\Users\Asus\Desktop\Mirtanis\Mirtanis\frontend\dist\mirtanis
 
-    src/app/shared/components/navbar.component.ts:7:2:
-[37m      7 │   [32mimports[37m: [RouterLink, RouterLinkActive],
-        ╵   [32m~~~~~~~[0m
-
-[39m[22m
-[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Opening tag "button" not terminated.[0m [1m[35m[plugin angular-compiler][0m
-
-    src/app/pages/home/sections/testimonials-section.component.ts:31:14:
-[37m      31 │ ...          [32m<button (click)="active.set(i)" [attr.aria-label]="'R[37m...
-         ╵              [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
-
-
-[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "button". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
-
-    src/app/pages/home/sections/testimonials-section.component.ts:34:93:
-[37m      34 │ ..."active() !== i" [class.bg-gold-300/40]="active() !== i">[32m</button>[37m
-         ╵                                                             [32m~~~~~~~~~[0m
-
-
-[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Opening tag "header" not terminated.[0m [1m[35m[plugin angular-compiler][0m
-
-    src/app/shared/components/navbar.component.ts:14:4:
-[37m      14 │     [32m<header[37m
-         ╵     [32m~~~~~~~[0m
-
-
-[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "header". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
-
-    src/app/shared/components/navbar.component.ts:58:4:
-[37m      58 │     [32m</header>[37m
-         ╵     [32m~~~~~~~~~[0m
-
-[39m[22m

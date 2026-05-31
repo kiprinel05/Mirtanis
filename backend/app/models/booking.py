@@ -22,6 +22,11 @@ class BookingStatus(str, enum.Enum):
     cancelled = "cancelled"
 
 
+class Venue(str, enum.Enum):
+    cort = "cort"
+    sala = "sala"
+
+
 class Booking(Base):
     __tablename__ = "bookings"
 
@@ -30,6 +35,7 @@ class Booking(Base):
     phone = Column(String(40), nullable=False)
     email = Column(String(255), nullable=False, index=True)
     event_type = Column(Enum(EventType, name="event_type"), nullable=False)
+    venue = Column(Enum(Venue, name="venue"), nullable=False, server_default=Venue.cort.value)
     guests = Column(Integer, nullable=False, default=0)
     event_date = Column(Date, nullable=False, index=True)
     message = Column(Text, nullable=True)

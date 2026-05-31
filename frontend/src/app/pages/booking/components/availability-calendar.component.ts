@@ -11,11 +11,11 @@ type Cell = { date: Date; inMonth: boolean; iso: string; status?: string; isPast
       <div class="mb-5 flex items-center justify-between">
         <button type="button" (click)="prev()"
                 class="grid h-10 w-10 place-items-center rounded-full border border-cream-400 text-ink-700 transition hover:border-gold-400 hover:text-gold-600"
-                aria-label="Luna anterioară">‹</button>
+                aria-label="Luna anterioară"><span class="mi text-[22px]">chevron_left</span></button>
         <p class="font-display text-2xl capitalize text-ink-900">{{ label }}</p>
         <button type="button" (click)="next()"
                 class="grid h-10 w-10 place-items-center rounded-full border border-cream-400 text-ink-700 transition hover:border-gold-400 hover:text-gold-600"
-                aria-label="Luna următoare">›</button>
+                aria-label="Luna următoare"><span class="mi text-[22px]">chevron_right</span></button>
       </div>
 
       <div class="mb-2 grid grid-cols-7 gap-1.5 text-center text-[11px] uppercase tracking-wider text-ink-400">
@@ -49,6 +49,8 @@ type Cell = { date: Date; inMonth: boolean; iso: string; status?: string; isPast
 export class AvailabilityCalendarComponent implements OnChanges {
   @Input() days: DayStatus[] = [];
   @Input() selected: string | null = null;
+  /** In admin mode every (non-past) day is clickable, including booked/blocked. */
+  @Input() adminMode = false;
   @Output() daySelected = new EventEmitter<string>();
   @Output() monthChanged = new EventEmitter<{ start: string; end: string }>();
 
@@ -106,7 +108,10 @@ export class AvailabilityCalendarComponent implements OnChanges {
   }
 
   disabled(c: Cell): boolean {
-    return !c.inMonth || c.isPast || c.status === 'booked' || c.status === 'blocked';
+    if (!c.inMonth || c.isPast) return true;
+    // Admins may click any day (to release/override it); guests can't pick taken days.
+    if (this.adminMode) return false;
+    return c.status === 'booked' || c.status === 'blocked';
   }
 
   pick(c: Cell): void {
@@ -117,10 +122,12 @@ export class AvailabilityCalendarComponent implements OnChanges {
   cellClass(c: Cell): string {
     if (!c.inMonth) return 'text-transparent pointer-events-none';
     if (c.isPast) return 'text-ink-400/50 cursor-not-allowed';
+    const taken = c.status === 'booked' || c.status === 'blocked';
+    const cursor = (taken && !this.adminMode) ? 'cursor-not-allowed' : 'cursor-pointer';
     switch (c.status) {
-      case 'booked':  return 'bg-blush-100 text-blush-400 cursor-not-allowed';
-      case 'pending': return 'bg-gold-100 text-gold-700';
-      case 'blocked': return 'bg-cream-300 text-ink-400 cursor-not-allowed';
+      case 'booked':  return `bg-blush-100 text-blush-400 ${cursor}`;
+      case 'pending': return `bg-gold-100 text-gold-700 ${cursor}`;
+      case 'blocked': return `bg-cream-300 text-ink-500 ${cursor}`;
       default:        return 'bg-sage-50 text-sage-600 hover:bg-gold-400 hover:text-cream-50';
     }
   }

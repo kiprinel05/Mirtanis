@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
-from app.models.booking import EventType, BookingStatus
+from app.models.booking import EventType, BookingStatus, Venue
 
 
 class BookingCreate(BaseModel):
@@ -9,6 +9,7 @@ class BookingCreate(BaseModel):
     phone: str = Field(min_length=6, max_length=40)
     email: EmailStr
     event_type: EventType
+    venue: Venue
     guests: int = Field(ge=1, le=2000)
     event_date: date
     message: Optional[str] = Field(default=None, max_length=2000)
@@ -16,6 +17,7 @@ class BookingCreate(BaseModel):
 
 class BookingUpdate(BaseModel):
     status: Optional[BookingStatus] = None
+    venue: Optional[Venue] = None
     message: Optional[str] = None
 
 
@@ -25,6 +27,7 @@ class BookingOut(BaseModel):
     phone: str
     email: EmailStr
     event_type: EventType
+    venue: Venue
     guests: int
     event_date: date
     message: Optional[str]

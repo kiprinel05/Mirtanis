@@ -31,7 +31,7 @@ interface Faq { q: string; a: string; }
                       [attr.aria-expanded]="opened() === i">
                 <span class="font-display text-lg text-ink-900 sm:text-xl">{{ f.q }}</span>
                 <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-gold-300 text-gold-600 transition-transform duration-300"
-                      [class.rotate-45]="opened() === i">+</span>
+                      [class.rotate-45]="opened() === i"><span class="mi text-[20px]">add</span></span>
               </button>
               <div class="grid overflow-hidden transition-all duration-500"
                    [style.grid-template-rows]="opened() === i ? '1fr' : '0fr'">
@@ -51,7 +51,7 @@ export class FaqSectionComponent {
   toggle(i: number): void { this.opened.update((v) => (v === i ? null : i)); }
 
   readonly faqs: Faq[] = [
-    { q: 'Care este capacitatea maximă?', a: 'Cortul premium pe lac găzduiește până la 350 de invitați, iar sala interioară până la 500. Putem adapta aranjarea în funcție de numărul vostru.' },
+    { q: 'Care este capacitatea maximă?', a: 'Cortul premium pe lac găzduiește până la 200 de invitați, iar sala interioară până la 100. Putem adapta aranjarea în funcție de numărul vostru.' },
     { q: 'Până la ce oră se poate asculta muzică?', a: 'Programul standard al evenimentelor se întinde până dimineața. Discutăm împreună orarul exact, în funcție de tipul evenimentului și preferințe.' },
     { q: 'Percepeți taxă de dop?', a: 'Politica privind băuturile aduse de client se stabilește la rezervare. Avem și pachete all-inclusive cu băuturi, pentru simplitate.' },
     { q: 'Care este avansul minim pentru rezervare?', a: 'Pentru a bloca o dată în calendar solicităm un avans, restul fiind eșalonat până aproape de eveniment. Detaliile le primești în oferta personalizată.' },

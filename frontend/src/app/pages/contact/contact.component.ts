@@ -29,7 +29,7 @@ import { IMAGES } from '../../shared/data/images';
           <ul class="mt-8 space-y-5" appReveal="up" [revealStagger]="90" [revealDelay]="150">
             @for (c of contacts; track c.label) {
               <li class="flex items-start gap-4">
-                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold-100 text-gold-600">{{ c.icon }}</span>
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold-100 text-gold-600"><span class="mi text-[20px]">{{ c.icon }}</span></span>
                 <div>
                   <p class="text-xs uppercase tracking-widest2 text-ink-500">{{ c.label }}</p>
                   @if (c.href) {
@@ -57,7 +57,7 @@ import { IMAGES } from '../../shared/data/images';
         <div class="card p-6 sm:p-8" appReveal="right" [revealDelay]="120">
           @if (success()) {
             <div class="py-12 text-center">
-              <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-sage-100 text-3xl text-sage-600">✓</div>
+              <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-sage-100 text-sage-600"><span class="mi text-[34px]">check</span></div>
               <h3 class="font-display text-3xl text-ink-900">Mesaj trimis!</h3>
               <p class="mx-auto mt-3 max-w-sm text-ink-600">Mulțumim pentru mesaj. Revenim către tine în cel mai scurt timp.</p>
               <button class="btn btn-outline mt-8" (click)="success.set(false)">Trimite alt mesaj</button>
@@ -108,9 +108,9 @@ export class ContactComponent {
   readonly error = signal<string | null>(null);
 
   readonly contacts = [
-    { icon: '✉', label: 'Email', value: 'contact@mirtanis.ro', href: 'mailto:contact@mirtanis.ro' },
-    { icon: '☎', label: 'Telefon', value: '+40 7XX XXX XXX', href: 'tel:+407XXXXXXXX' },
-    { icon: '⚲', label: 'Locație', value: 'Malul Lacului, România', href: null }
+    { icon: 'mail', label: 'Email', value: 'contact@mirtanis.ro', href: 'mailto:contact@mirtanis.ro' },
+    { icon: 'call', label: 'Telefon', value: '+40 7XX XXX XXX', href: 'tel:+407XXXXXXXX' },
+    { icon: 'location_on', label: 'Locație', value: 'Malul Lacului, România', href: null }
   ];
 
   readonly form = this.fb.nonNullable.group({

@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, inject } from '@angular/core';
 
 type RevealMode = '' | 'up' | 'down' | 'left' | 'right' | 'scale' | 'blur';
 
@@ -6,16 +6,19 @@ type RevealMode = '' | 'up' | 'down' | 'left' | 'right' | 'scale' | 'blur';
  * Scroll-reveal directive (IntersectionObserver based, GPU-friendly).
  *
  * Usage:
- *   <div appReveal></div>                  // fade-up (default)
- *   <div appReveal="left"></div>           // slide from left
+ *   <div appReveal></div>                            // fade-up (default)
+ *   <div appReveal="left"></div>                     // slide from left
  *   <div appReveal [revealDelay]="200"></div>
- *   <ul appReveal="up" [revealStagger]="90">…</ul>  // stagger DIRECT children
+ *   <ul appReveal="up" [revealStagger]="90">…</ul>   // stagger DIRECT children
+ *
+ * Runs in ngAfterViewInit so @for-generated children already exist when we
+ * collect them for staggering.
  */
 @Directive({
   selector: '[appReveal]',
   standalone: true
 })
-export class RevealDirective implements OnInit, OnDestroy {
+export class RevealDirective implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef<HTMLElement>);
   private observer?: IntersectionObserver;
   private rafId = 0;
@@ -26,10 +29,10 @@ export class RevealDirective implements OnInit, OnDestroy {
   /** When > 0, animate direct children sequentially instead of the host as a whole. */
   @Input() revealStagger = 0;
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     const host = this.el.nativeElement;
     const targets = this.revealStagger > 0
-      ? Array.from(host.children) as HTMLElement[]
+      ? (Array.from(host.children) as HTMLElement[])
       : [host];
 
     targets.forEach((node, i) => {
@@ -84,6 +87,9 @@ export class RevealDirective implements OnInit, OnDestroy {
           node.style.transform = 'translate3d(0,0,0) scale(1)';
           node.style.filter = 'none';
         }
+        // Drop will-change once the entrance is done so it doesn't pin layers.
+        const total = this.revealDuration + this.revealDelay + targets.length * this.revealStagger + 80;
+        setTimeout(() => targets.forEach((n) => (n.style.willChange = 'auto')), total);
       });
     });
   }

@@ -37,10 +37,31 @@ def bootstrap_admin() -> None:
         db.close()
 
 
+def ensure_schema() -> None:
+    """Lightweight, idempotent migrations for setups without Alembic.
+
+    Adds columns introduced after the first deployment so existing databases
+    keep working without a manual migration step.
+    """
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(engine)
+    if "bookings" not in inspector.get_table_names():
+        return
+    columns = {c["name"] for c in inspector.get_columns("bookings")}
+    if "venue" not in columns:
+        logger.info("Adding missing 'venue' column to bookings")
+        with engine.begin() as conn:
+            conn.execute(
+                text("ALTER TABLE bookings ADD COLUMN venue VARCHAR(10) NOT NULL DEFAULT 'cort'")
+            )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
+        ensure_schema()
         bootstrap_admin()
     except OperationalError as e:
         logger.error("DB not reachable on startup: %s", e)

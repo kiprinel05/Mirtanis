@@ -4,7 +4,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header.compone
 import { AvailabilityCalendarComponent } from './components/availability-calendar.component';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { BookingService } from '../../core/services/booking.service';
-import { DayStatus, EventType } from '../../core/models/api.models';
+import { DayStatus, EventType, Venue } from '../../core/models/api.models';
 import { IMAGES } from '../../shared/data/images';
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
@@ -16,6 +16,11 @@ const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'private', label: 'Eveniment privat' },
   { value: 'garden', label: 'Garden party' },
   { value: 'altul', label: 'Altul' }
+];
+
+const VENUES: { value: Venue; label: string; hint: string; icon: string }[] = [
+  { value: 'cort', label: 'Cort Premium pe Lac', hint: 'până la 200 invitați', icon: 'festival' },
+  { value: 'sala', label: 'Sala Interioară', hint: 'până la 100 invitați', icon: 'meeting_room' }
 ];
 
 @Component({
@@ -64,7 +69,7 @@ const EVENT_TYPES: { value: EventType; label: string }[] = [
 
           @if (success()) {
             <div class="py-10 text-center">
-              <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-sage-100 text-3xl text-sage-600">✓</div>
+              <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-sage-100 text-sage-600"><span class="mi text-[34px]">check</span></div>
               <h3 class="font-display text-3xl text-ink-900">Cererea a fost trimisă!</h3>
               <p class="mx-auto mt-3 max-w-sm text-ink-600">
                 Mulțumim! Te vom contacta în cel mai scurt timp pentru a confirma detaliile evenimentului tău.
@@ -92,6 +97,30 @@ const EVENT_TYPES: { value: EventType; label: string }[] = [
                       }
                     </div>
                   </div>
+
+                  <div>
+                    <label class="field-label">Locație</label>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                      @for (v of venues; track v.value) {
+                        <button type="button" (click)="form.controls.venue.setValue(v.value)"
+                                class="flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition"
+                                [class.border-gold-500]="form.value.venue === v.value"
+                                [class.bg-gold-50]="form.value.venue === v.value"
+                                [class.border-cream-400]="form.value.venue !== v.value">
+                          <span class="mi text-[24px]"
+                                [class.text-gold-600]="form.value.venue === v.value"
+                                [class.text-ink-400]="form.value.venue !== v.value">{{ v.icon }}</span>
+                          <span>
+                            <span class="block text-sm font-medium"
+                                  [class.text-gold-700]="form.value.venue === v.value"
+                                  [class.text-ink-700]="form.value.venue !== v.value">{{ v.label }}</span>
+                            <span class="block text-xs text-ink-400">{{ v.hint }}</span>
+                          </span>
+                        </button>
+                      }
+                    </div>
+                  </div>
+
                   <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label class="field-label">Data evenimentului</label>
@@ -130,7 +159,7 @@ const EVENT_TYPES: { value: EventType; label: string }[] = [
                     <textarea class="field min-h-[110px] resize-none" formControlName="message" placeholder="Spune-ne mai multe despre evenimentul tău…"></textarea>
                   </div>
                   <div class="flex justify-between">
-                    <button type="button" class="btn btn-ghost" (click)="prevStep()">← Înapoi</button>
+                    <button type="button" class="btn btn-ghost" (click)="prevStep()"><span class="mi text-[18px]">arrow_back</span> Înapoi</button>
                     <button type="button" class="btn btn-gold" (click)="nextStep()" [disabled]="!step2Valid()">Continuă</button>
                   </div>
                 </div>
@@ -150,7 +179,7 @@ const EVENT_TYPES: { value: EventType; label: string }[] = [
                   </dl>
                   @if (error()) { <p class="text-sm text-blush-400">{{ error() }}</p> }
                   <div class="flex justify-between">
-                    <button type="button" class="btn btn-ghost" (click)="prevStep()">← Înapoi</button>
+                    <button type="button" class="btn btn-ghost" (click)="prevStep()"><span class="mi text-[18px]">arrow_back</span> Înapoi</button>
                     <button type="submit" class="btn btn-gold" [disabled]="loading()">
                       {{ loading() ? 'Se trimite…' : 'Trimite cererea' }}
                     </button>
@@ -170,6 +199,7 @@ export class BookingComponent implements OnInit {
 
   readonly headerImg = IMAGES.ceremonyChairs;
   readonly eventTypes = EVENT_TYPES;
+  readonly venues = VENUES;
   readonly stepLabels = ['Eveniment', 'Contact', 'Confirmare'];
   readonly todayIso = new Date().toISOString().slice(0, 10);
 
@@ -182,6 +212,7 @@ export class BookingComponent implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     event_type: ['nunta' as EventType, Validators.required],
+    venue: ['cort' as Venue, Validators.required],
     event_date: ['', Validators.required],
     guests: [100, [Validators.required, Validators.min(1), Validators.max(2000)]],
     full_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -193,8 +224,10 @@ export class BookingComponent implements OnInit {
   readonly summary = computed(() => {
     const v = this.form.getRawValue();
     const label = EVENT_TYPES.find((t) => t.value === v.event_type)?.label ?? v.event_type;
+    const venueLabel = VENUES.find((x) => x.value === v.venue)?.label ?? v.venue;
     return [
       { k: 'Eveniment', v: label },
+      { k: 'Locație', v: venueLabel },
       { k: 'Data', v: v.event_date || '—' },
       { k: 'Invitați', v: String(v.guests) },
       { k: 'Nume', v: v.full_name },
@@ -224,7 +257,8 @@ export class BookingComponent implements OnInit {
   }
 
   step1Valid(): boolean {
-    return this.form.controls.event_type.valid && this.form.controls.event_date.valid && this.form.controls.guests.valid;
+    return this.form.controls.event_type.valid && this.form.controls.venue.valid
+      && this.form.controls.event_date.valid && this.form.controls.guests.valid;
   }
   step2Valid(): boolean {
     return this.form.controls.full_name.valid && this.form.controls.phone.valid && this.form.controls.email.valid;
@@ -251,7 +285,7 @@ export class BookingComponent implements OnInit {
   }
 
   reset(): void {
-    this.form.reset({ event_type: 'nunta', guests: 100, event_date: '', full_name: '', phone: '', email: '', message: '' });
+    this.form.reset({ event_type: 'nunta', venue: 'cort', guests: 100, event_date: '', full_name: '', phone: '', email: '', message: '' });
     this.selectedDay.set(null);
     this.step.set(1);
     this.success.set(false);

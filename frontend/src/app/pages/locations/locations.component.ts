@@ -52,7 +52,7 @@ interface Venue {
               <ul class="mt-8 grid gap-3 sm:grid-cols-2" appReveal="up" [revealStagger]="70" [revealDelay]="150">
                 @for (f of v.features; track f) {
                   <li class="flex items-center gap-3 text-ink-700">
-                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sage-100 text-sm text-sage-600">✓</span>
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sage-100 text-sage-600"><span class="mi text-[15px]">check</span></span>
                     {{ f }}
                   </li>
                 }
@@ -82,10 +82,10 @@ export class LocationsComponent {
     {
       tag: 'În aer liber · pe lac',
       title: 'Cort Premium pe Lac',
-      capacity: 'Până la 350 invitați',
+      capacity: 'Până la 200 invitați',
       desc: 'Un cort elegant cu pereți transparenți, deschis către apă și cer. Ziua, lumina naturală se revarsă înăuntru; seara, ghirlandele aurii transformă totul într-un decor de basm.',
       features: [
-        'Capacitate până la 350 de invitați',
+        'Capacitate până la 200 de invitați',
         'Vedere panoramică spre lac',
         'Ring de dans și scenă',
         'Iluminat ambiental & ghirlande',
@@ -97,10 +97,10 @@ export class LocationsComponent {
     {
       tag: 'Eleganță all-season',
       title: 'Sala Interioară',
-      capacity: 'Până la 500 invitați',
-      desc: 'Un spațiu rafinat, cu tavane înalte, candelabre și detalii aurii. Perfect climatizat, este alegerea ideală pentru orice anotimp și pentru evenimente intime sau ample, deopotrivă.',
+      capacity: 'Până la 100 invitați',
+      desc: 'Un spațiu rafinat, cu tavane înalte, candelabre și detalii aurii. Perfect climatizat, este alegerea ideală pentru orice anotimp și pentru evenimente intime, deopotrivă.',
       features: [
-        'Capacitate până la 500 de invitați',
+        'Capacitate până la 100 de invitați',
         'Climatizare completă',
         'Sistem audio-video profesional',
         'Lounge & zonă de protocol',

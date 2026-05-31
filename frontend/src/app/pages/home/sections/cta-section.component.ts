@@ -1,17 +1,20 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
+import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-cta-section',
   standalone: true,
-  imports: [RouterLink, RevealDirective],
+  imports: [RouterLink, RevealDirective, ParallaxDirective],
   template: `
     <section class="section">
       <div class="container-x">
         <div class="relative overflow-hidden rounded-4xl shadow-card" appReveal="scale">
-          <img [src]="bg" alt="Petrecere cu lumini" class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+          <div appParallax [parallaxFactor]="0.18" class="absolute inset-x-0 -top-[14%] h-[128%]">
+            <img [src]="bg" alt="Petrecere cu lumini" class="h-full w-full object-cover" loading="lazy" />
+          </div>
           <div class="absolute inset-0 bg-gradient-to-r from-sage-700/90 via-sage-700/70 to-sage-600/50"></div>
           <div class="relative px-7 py-16 text-center text-cream-50 sm:px-12 sm:py-24">
             <p class="script text-3xl !text-gold-200 sm:text-4xl">Hai să ne cunoaștem</p>

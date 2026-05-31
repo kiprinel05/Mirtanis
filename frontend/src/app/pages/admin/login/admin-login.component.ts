@@ -2,45 +2,72 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   template: `
-    <section class="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 py-24">
-      <div class="absolute inset-0">
-        <img [src]="bg" alt="" class="h-full w-full object-cover" />
-        <div class="absolute inset-0 bg-cream-100/92"></div>
-      </div>
+    <main class="flex min-h-[100svh] items-center justify-center bg-cream-100 px-5 py-10">
+      <div class="w-full max-w-md">
+        <!-- Back link -->
+        <a routerLink="/" class="mb-5 inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors hover:text-gold-600">
+          <span class="mi text-[18px]">arrow_back</span> Înapoi pe site
+        </a>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="card relative z-10 w-full max-w-md p-8 sm:p-10">
-        <a routerLink="/" class="mb-6 inline-flex items-center gap-2 text-sm text-ink-500 transition-colors hover:text-gold-600">← Înapoi pe site</a>
-        <img src="/logo-mare.png" alt="Mirtanis Events" class="h-12 w-auto" style="filter: drop-shadow(0 1px 4px rgba(120,90,30,.3));" />
-        <h1 class="mt-4 font-display text-3xl text-ink-900">Panou administrare</h1>
-        <p class="mt-2 text-sm text-ink-500">Autentifică-te cu contul de administrator.</p>
+        <!-- Card -->
+        <div class="card overflow-hidden">
+          <!-- Header band -->
+          <div class="flex flex-col items-center gap-4 border-b border-cream-300 bg-cream-50 px-6 py-8 text-center sm:px-10">
+            <img src="/logo-mare.png" alt="Mirtanis Events" class="h-11 w-auto"
+                 style="filter: drop-shadow(0 1px 4px rgba(120,90,30,.3));" />
+            <div>
+              <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-gold-100 px-3 py-1 text-[10px] font-medium uppercase tracking-widest2 text-gold-700">
+                <span class="mi text-[15px]">lock</span> Acces administrator
+              </div>
+              <h1 class="font-display text-3xl text-ink-900 sm:text-4xl">Bine ai revenit</h1>
+              <p class="mt-1.5 text-sm text-ink-500">Autentifică-te pentru a continua în panou.</p>
+            </div>
+          </div>
 
-        <div class="mt-8 space-y-5">
-          <div>
-            <label class="field-label">Email</label>
-            <input class="field" type="email" formControlName="email" autocomplete="email" placeholder="admin@mirtanis.ro" />
-          </div>
-          <div>
-            <label class="field-label">Parolă</label>
-            <input class="field" type="password" formControlName="password" autocomplete="current-password" placeholder="••••••••" />
-          </div>
+          <!-- Form -->
+          <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5 px-6 py-8 sm:px-10">
+            <div>
+              <label class="field-label">Email</label>
+              <div class="relative">
+                <span class="mi pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-ink-400">mail</span>
+                <input class="field pl-11" type="email" inputmode="email" formControlName="email" autocomplete="email" placeholder="admin@mirtanis.ro" />
+              </div>
+            </div>
+
+            <div>
+              <label class="field-label">Parolă</label>
+              <div class="relative">
+                <span class="mi pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-ink-400">lock</span>
+                <input class="field pl-11 pr-11" [type]="showPass() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" placeholder="••••••••" />
+                <button type="button" (click)="showPass.set(!showPass())"
+                        class="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-ink-400 transition-colors hover:text-gold-600"
+                        [attr.aria-label]="showPass() ? 'Ascunde parola' : 'Arată parola'">
+                  <span class="mi text-[20px]">{{ showPass() ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+              </div>
+            </div>
+
+            @if (error()) {
+              <p class="flex items-center gap-2 rounded-xl border border-blush-200 bg-blush-50 p-3 text-sm text-blush-400">
+                <span class="mi text-[18px]">error</span> {{ error() }}
+              </p>
+            }
+
+            <button type="submit" class="btn btn-gold w-full" [disabled]="!form.valid || loading()">
+              {{ loading() ? 'Se autentifică…' : 'Autentificare' }}
+            </button>
+          </form>
         </div>
 
-        @if (error()) {
-          <p class="mt-5 rounded-xl border border-blush-200 bg-blush-50 p-3 text-sm text-blush-400">{{ error() }}</p>
-        }
-
-        <button type="submit" class="btn btn-gold mt-7 w-full" [disabled]="!form.valid || loading()">
-          {{ loading() ? 'Se autentifică…' : 'Autentificare' }}
-        </button>
-      </form>
-    </section>
+        <p class="mt-6 text-center text-xs text-ink-400">© {{ year }} Mirtanis Events</p>
+      </div>
+    </main>
   `
 })
 export class AdminLoginComponent {
@@ -48,9 +75,10 @@ export class AdminLoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  readonly bg = IMAGES.hallInterior;
+  readonly year = new Date().getFullYear();
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+  readonly showPass = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],

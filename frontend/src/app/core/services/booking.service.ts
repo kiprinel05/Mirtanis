@@ -8,7 +8,8 @@ import {
   BookingStatus,
   CalendarRange,
   DayStatus,
-  AvailabilityStatus
+  AvailabilityStatus,
+  Venue
 } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +27,7 @@ export class BookingService {
     return this.http.get<Booking[]>(`${this.base}/bookings`, { params });
   }
 
-  updateBooking(id: number, patch: { status?: BookingStatus; message?: string }): Observable<Booking> {
+  updateBooking(id: number, patch: { status?: BookingStatus; venue?: Venue; message?: string }): Observable<Booking> {
     return this.http.patch<Booking>(`${this.base}/bookings/${id}`, patch);
   }
 

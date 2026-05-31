@@ -2,17 +2,20 @@ import { AfterViewInit, Component, ElementRef, effect, inject, viewChild } from 
 import { RouterLink } from '@angular/router';
 import { IMAGES } from '../../../shared/data/images';
 import { AppStateService } from '../../../core/services/app-state.service';
+import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 
 @Component({
   selector: 'app-hero-section',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ParallaxDirective],
   template: `
     <section class="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
-      <!-- Background image with slow ken-burns -->
-      <div class="absolute inset-0">
-        <img [src]="hero" alt="Locație de nuntă pe malul lacului Mirtanis"
-             class="h-full w-full animate-ken-burns object-cover" fetchpriority="high" />
+      <!-- Background image with slow ken-burns + scroll parallax -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div appParallax [parallaxFactor]="0.22" class="absolute inset-x-0 -top-[14%] h-[128%]">
+          <img [src]="hero" alt="Locație de nuntă pe malul lacului Mirtanis"
+               class="h-full w-full animate-ken-burns object-cover" fetchpriority="high" />
+        </div>
         <!-- Layered scrims: top (for navbar), bottom fade, and a centred focus glow -->
         <div class="absolute inset-0 bg-gradient-to-b from-cream-50/45 via-transparent to-cream-100/95"></div>
         <div class="absolute inset-0"
@@ -49,8 +52,8 @@ import { AppStateService } from '../../../core/services/app-state.service';
 
       <!-- Scroll cue -->
       <div class="absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
-        <div class="flex flex-col items-center gap-2 text-cream-50/80">
-          <span class="text-[10px] uppercase tracking-widest2">Derulează</span>
+        <div class="flex flex-col items-center gap-2 text-gold-700">
+          <span class="text-[10px] font-medium uppercase tracking-widest2">Derulează</span>
           <span class="scroll-cue"></span>
         </div>
       </div>
@@ -86,11 +89,11 @@ import { AppStateService } from '../../../core/services/app-state.service';
 
     .scroll-cue {
       position: relative; display: block; width: 22px; height: 36px;
-      border: 1px solid rgba(255,255,255,.7); border-radius: 999px;
+      border: 1px solid rgba(154,114,46,.55); border-radius: 999px;
     }
     .scroll-cue::after {
       content: ''; position: absolute; left: 50%; top: 7px;
-      width: 4px; height: 8px; margin-left: -2px; border-radius: 999px; background: #fff;
+      width: 4px; height: 8px; margin-left: -2px; border-radius: 999px; background: #b68a36;
       animation: scroll-dot 1.6s ease-in-out infinite;
     }
     @keyframes scroll-dot {

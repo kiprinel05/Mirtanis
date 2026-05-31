@@ -75,14 +75,14 @@ const CATEGORIES: { key: GalleryCategory | 'all'; label: string }[] = [
     <!-- Lightbox -->
     @if (lightbox() !== null) {
       <div class="fixed inset-0 z-[80] flex items-center justify-center bg-ink-900/90 p-4 backdrop-blur-sm" (click)="close()">
-        <button class="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-cream-50/10 text-2xl text-cream-50 hover:bg-cream-50/20"
-                (click)="close(); $event.stopPropagation()" aria-label="Închide">×</button>
-        <button class="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-2xl text-cream-50 hover:bg-cream-50/20 sm:left-8"
-                (click)="prev(); $event.stopPropagation()" aria-label="Anterioara">‹</button>
+        <button class="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-cream-50/10 text-cream-50 hover:bg-cream-50/20"
+                (click)="close(); $event.stopPropagation()" aria-label="Închide"><span class="mi text-[24px]">close</span></button>
+        <button class="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-cream-50 hover:bg-cream-50/20 sm:left-8"
+                (click)="prev(); $event.stopPropagation()" aria-label="Anterioara"><span class="mi text-[28px]">chevron_left</span></button>
         <img [src]="filtered()[lightbox()!].url" [alt]="filtered()[lightbox()!].title || ''"
              class="max-h-[85vh] max-w-[92vw] rounded-2xl object-contain shadow-lift" (click)="$event.stopPropagation()" />
-        <button class="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-2xl text-cream-50 hover:bg-cream-50/20 sm:right-8"
-                (click)="next(); $event.stopPropagation()" aria-label="Următoarea">›</button>
+        <button class="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-cream-50 hover:bg-cream-50/20 sm:right-8"
+                (click)="next(); $event.stopPropagation()" aria-label="Următoarea"><span class="mi text-[28px]">chevron_right</span></button>
       </div>
     }
   `
