@@ -23,11 +23,11 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
       <div class="nav-surface"></div>
 
       <nav
-        class="container-x relative flex items-center justify-between transition-all"
-        [class.py-3]="scrolled()"
-        [class.py-5]="!scrolled()"
+        class="container-x relative flex items-center justify-between py-3 transition-all duration-300"
+        [class.sm:py-3]="scrolled()"
+        [class.sm:py-5]="!scrolled()"
       >
-        <!-- Brand -->
+        <!-- Brand: fixed size on mobile, shrinks only on desktop (sm+) when scrolled -->
         <a
           routerLink="/"
           class="group flex items-center tap-highlight-none"
@@ -37,9 +37,9 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           <img
             src="/logo-mare-v2.png"
             alt="Mirtanis Events"
-            class="brand-logo w-auto transition-all duration-500 group-hover:scale-[1.03]"
-            [class.h-11]="!scrolled()"
-            [class.h-10]="scrolled()"
+            class="brand-logo h-11 w-auto transition-all duration-300 group-hover:scale-[1.03]"
+            [class.sm:h-10]="scrolled()"
+            [class.sm:h-14]="!scrolled()"
           />
         </a>
 
@@ -57,12 +57,14 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
               {{ l.label }}
             </a>
           }
-          <a routerLink="/rezervari" class="btn btn-gold py-2.5 text-sm">Verifică data</a>
+          <a routerLink="/rezervari" class="btn btn-gold py-2.5 text-sm"
+            >Verifică data</a
+          >
         </div>
 
         <!-- Mobile toggle: animated hamburger ↔ X -->
         <button
-          class="burger relative grid h-11 w-11 place-items-center rounded-full lg:hidden tap-highlight-none"
+          class="burger relative grid h-9 w-9 place-items-center rounded-full lg:hidden tap-highlight-none"
           [class.is-open]="open()"
           (click)="toggle()"
           [attr.aria-expanded]="open()"
@@ -93,9 +95,15 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           }
           <div
             class="mm-link mt-6 flex justify-center"
-            [style.transition-delay]="open() ? 80 + links.length * 50 + 'ms' : '0ms'"
+            [style.transition-delay]="
+              open() ? 80 + links.length * 50 + 'ms' : '0ms'
+            "
           >
-            <a routerLink="/rezervari" (click)="close()" class="btn btn-gold px-10">
+            <a
+              routerLink="/rezervari"
+              (click)="close()"
+              class="btn btn-gold px-10"
+            >
               Verifică disponibilitatea
             </a>
           </div>
@@ -110,7 +118,9 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   `,
   styles: [
     `
-      :host { display: contents; }
+      :host {
+        display: contents;
+      }
 
       /* ===== Surface: scrim normally, solid when scrolled/open ===== */
       .nav-surface {
@@ -124,64 +134,140 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
         );
         backdrop-filter: blur(3px);
         pointer-events: none;
-        transition: background 0.5s ease, box-shadow 0.5s ease, backdrop-filter 0.5s ease;
+        transition:
+          background 0.5s ease,
+          box-shadow 0.5s ease,
+          backdrop-filter 0.5s ease;
       }
-      header.scrolled .nav-surface,
-      header.is-open .nav-surface {
+      header.scrolled .nav-surface {
         background: rgba(255, 253, 250, 0.95);
         backdrop-filter: blur(18px) saturate(150%);
         box-shadow: 0 18px 50px -28px rgba(94, 75, 35, 0.55);
       }
+      /* When open, the bar merges seamlessly into the panel below it —
+         same solid fill, no bottom radius, no shadow/hairline between them. */
       header.is-open .nav-surface {
-        border-radius: 0 0 26px 26px;
+        background: rgba(255, 253, 250, 0.97);
+        backdrop-filter: blur(18px) saturate(150%);
+        box-shadow: none;
+        border-radius: 0;
       }
-      header.scrolled .nav-surface::after {
+      header.scrolled:not(.is-open) .nav-surface::after {
         content: "";
-        position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(205, 162, 75, 0.5) 50%, transparent);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(205, 162, 75, 0.5) 50%,
+          transparent
+        );
       }
-      header.is-open .nav-surface::after { opacity: 0; }
+      header.is-open .nav-surface::after {
+        opacity: 0;
+      }
 
-      .brand-logo { filter: drop-shadow(0 1px 6px rgba(120, 90, 30, 0.35)); }
+      .brand-logo {
+        filter: drop-shadow(0 1px 6px rgba(120, 90, 30, 0.35));
+      }
 
       /* ===== Animated hamburger ===== */
       .burger__box {
-        position: relative; display: block; width: 24px; height: 16px;
+        position: relative;
+        display: block;
+        width: 24px;
+        height: 16px;
       }
       .burger__line {
-        position: absolute; left: 0; height: 2px; width: 100%;
-        background: #241f19; border-radius: 2px;
-        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+        position: absolute;
+        left: 0;
+        height: 2px;
+        width: 100%;
+        background: #241f19;
+        border-radius: 2px;
+        transition:
+          transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.3s ease;
       }
-      .burger__line:nth-child(1) { top: 0; }
-      .burger__line:nth-child(2) { top: 7px; }
-      .burger__line:nth-child(3) { top: 14px; }
-      .burger.is-open .burger__line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-      .burger.is-open .burger__line:nth-child(2) { opacity: 0; transform: translateX(-8px); }
-      .burger.is-open .burger__line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+      .burger__line:nth-child(1) {
+        top: 0;
+      }
+      .burger__line:nth-child(2) {
+        top: 7px;
+      }
+      .burger__line:nth-child(3) {
+        top: 14px;
+      }
+      .burger.is-open .burger__line:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .burger.is-open .burger__line:nth-child(2) {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+      .burger.is-open .burger__line:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
 
-      /* ===== Expanding collapse panel ===== */
+      /* ===== Expanding collapse panel =====
+         Absolutely positioned so it never adds height to the bar itself. */
       .nav-collapse {
-        position: relative;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
         display: grid;
         grid-template-rows: 0fr;
         opacity: 0;
-        transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+        background: rgba(255, 253, 250, 0.97);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        border-radius: 0 0 26px 26px;
+        box-shadow: 0 30px 60px -34px rgba(40, 30, 12, 0.5);
+        pointer-events: none;
+        transition:
+          grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.4s ease;
       }
-      .nav-collapse > nav { overflow: hidden; min-height: 0; }
-      .nav-collapse.is-open { grid-template-rows: 1fr; opacity: 1; }
+      /* lift the panel up 1px so it overlaps the bar — no seam line */
+      .nav-collapse {
+        margin-top: -1px;
+      }
+      .nav-collapse > nav {
+        overflow: hidden;
+        min-height: 0;
+      }
+      .nav-collapse.is-open {
+        grid-template-rows: 1fr;
+        opacity: 1;
+        pointer-events: auto;
+      }
 
       .mm-link {
         opacity: 0;
         transform: translateY(-8px);
-        transition: opacity 0.45s ease, transform 0.45s ease, color 0.3s ease;
+        transition:
+          opacity 0.45s ease,
+          transform 0.45s ease,
+          color 0.3s ease;
       }
-      .nav-collapse.is-open .mm-link { opacity: 1; transform: translateY(0); }
+      .nav-collapse.is-open .mm-link {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
       /* ===== Page backdrop ===== */
-      .menu-backdrop--hide { opacity: 0; pointer-events: none; transition: opacity 0.45s ease; }
+      .menu-backdrop--hide {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.45s ease;
+      }
       .menu-backdrop--show {
-        opacity: 1; pointer-events: auto;
+        opacity: 1;
+        pointer-events: auto;
         background: rgba(40, 30, 16, 0.28);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
@@ -190,12 +276,21 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 
       /* ===== Progress bar ===== */
       .progress-track {
-        position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
         background: rgba(110, 81, 33, 0.08);
-        opacity: 0; transition: opacity 0.4s ease;
+        opacity: 0;
+        transition: opacity 0.4s ease;
       }
-      header.scrolled .progress-track { opacity: 1; }
-      header.is-open .progress-track { opacity: 0; }
+      header.scrolled .progress-track {
+        opacity: 1;
+      }
+      header.is-open .progress-track {
+        opacity: 0;
+      }
       .progress-fill {
         height: 100%;
         background: linear-gradient(90deg, #b68a36, #e4c071);
