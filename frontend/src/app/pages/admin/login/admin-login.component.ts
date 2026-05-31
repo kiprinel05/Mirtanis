@@ -19,7 +19,7 @@ import { AuthService } from '../../../core/services/auth.service';
         <div class="card overflow-hidden">
           <!-- Header band -->
           <div class="flex flex-col items-center gap-4 border-b border-cream-300 bg-cream-50 px-6 py-8 text-center sm:px-10">
-            <img src="/logo-mare.png" alt="Mirtanis Events" class="h-11 w-auto"
+            <img src="/logo-mare-v2.png" alt="Mirtanis Events" class="h-11 w-auto"
                  style="filter: drop-shadow(0 1px 4px rgba(120,90,30,.3));" />
             <div>
               <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-gold-100 px-3 py-1 text-[10px] font-medium uppercase tracking-widest2 text-gold-700">

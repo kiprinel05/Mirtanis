@@ -25,7 +25,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           aria-label="Mirtanis Events — acasă"
         >
           <img
-            src="/logo-mare.png"
+            src="/logo-mare-v2.png"
             alt="Mirtanis Events"
             class="brand-logo w-auto transition-all duration-500 group-hover:scale-[1.03]"
             [class.h-11]="!scrolled()"
@@ -78,7 +78,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
       <div class="mobile-menu__panel" (click)="$event.stopPropagation()">
         <!-- Top row: logo (left) + close (right) -->
         <div class="flex items-center justify-between">
-          <img src="/logo-mare.png" alt="Mirtanis Events" class="h-9 w-auto" />
+          <img src="/logo-mare-v2.png" alt="Mirtanis Events" class="h-9 w-auto" />
           <button
             (click)="close()"
             aria-label="Închide meniul"

@@ -16,7 +16,7 @@ import { RouterLink } from "@angular/router";
         <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <!-- Brand -->
           <div class="lg:col-span-1">
-            <img src="/logo-mare.png" alt="Mirtanis Events" class="h-11 w-auto sm:h-14" />
+            <img src="/logo-mare-v2.png" alt="Mirtanis Events" class="h-11 w-auto sm:h-14" />
             <p class="mt-4 max-w-xs text-sm leading-relaxed text-cream-100/70">
               O locație de poveste pe malul lacului, unde fiecare eveniment devine o amintire de neuitat.
             </p>

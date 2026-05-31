@@ -32,7 +32,7 @@ import { dismissBootLoader } from '../boot-loader';
               <circle cx="120" cy="120" r="116" class="loader__ring-arc" />
             </svg>
             <span class="loader__glow"></span>
-            <img src="/logo-mare.png" alt="Mirtanis Events" class="loader__logo" />
+            <img src="/logo-mare-v2.png" alt="Mirtanis Events" class="loader__logo" />
           </div>
 
           <div class="loader__bar"><span class="loader__bar-fill"></span></div>
