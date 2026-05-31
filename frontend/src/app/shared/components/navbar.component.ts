@@ -6,12 +6,21 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
+    <!-- Backdrop blur for the rest of the page while the mobile menu is open -->
+    <div
+      class="fixed inset-0 z-40 lg:hidden"
+      [class.menu-backdrop--show]="open()"
+      [class.menu-backdrop--hide]="!open()"
+      (click)="close()"
+    ></div>
+
     <header
       class="fixed inset-x-0 top-0 z-50 transition-all duration-500"
       [class.scrolled]="scrolled()"
+      [class.is-open]="open()"
     >
-      <!-- Always-on subtle scrim so the bar reads over any hero image -->
-      <div class="nav-scrim"></div>
+      <!-- Solid/scrim surface that also forms the expanding panel background -->
+      <div class="nav-surface"></div>
 
       <nav
         class="container-x relative flex items-center justify-between transition-all"
@@ -23,6 +32,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           routerLink="/"
           class="group flex items-center tap-highlight-none"
           aria-label="Mirtanis Events — acasă"
+          (click)="close()"
         >
           <img
             src="/logo-mare-v2.png"
@@ -47,85 +57,63 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
               {{ l.label }}
             </a>
           }
-          <a routerLink="/rezervari" class="btn btn-gold py-2.5 text-sm"
-            >Verifică data</a
-          >
+          <a routerLink="/rezervari" class="btn btn-gold py-2.5 text-sm">Verifică data</a>
         </div>
 
-        <!-- Mobile toggle -->
+        <!-- Mobile toggle: animated hamburger ↔ X -->
         <button
-          class="relative z-50 grid h-11 w-11 place-items-center rounded-full text-ink-900 lg:hidden tap-highlight-none"
+          class="burger relative grid h-11 w-11 place-items-center rounded-full lg:hidden tap-highlight-none"
+          [class.is-open]="open()"
           (click)="toggle()"
           [attr.aria-expanded]="open()"
           aria-label="Meniu"
         >
-          <span class="mi text-[28px]">menu</span>
+          <span class="burger__box">
+            <span class="burger__line"></span>
+            <span class="burger__line"></span>
+            <span class="burger__line"></span>
+          </span>
         </button>
       </nav>
 
-      <!-- Scroll progress (sits at the very bottom edge of the header, on its own track) -->
-      <div class="progress-track">
-        <div class="progress-fill" [style.width.%]="progress()"></div>
-      </div>
-    </header>
-
-    <!-- ===== Mobile menu: drops from the top, blurs the whole page ===== -->
-    <div
-      class="mobile-menu lg:hidden"
-      [class.is-open]="open()"
-      (click)="close()"
-    >
-      <div class="mobile-menu__panel" (click)="$event.stopPropagation()">
-        <!-- Top row: logo (left) + close (right) -->
-        <div class="flex items-center justify-between">
-          <img src="/logo-mare-v2.png" alt="Mirtanis Events" class="h-9 w-auto" />
-          <button
-            (click)="close()"
-            aria-label="Închide meniul"
-            class="grid h-11 w-11 place-items-center rounded-full text-ink-900 transition-colors hover:text-gold-600 tap-highlight-none"
-          >
-            <span class="mi text-[28px]">close</span>
-          </button>
-        </div>
-
-        <!-- Links (centered) -->
-        <nav class="mt-10 flex flex-col items-center">
+      <!-- Expanding mobile panel (part of the header itself) -->
+      <div class="nav-collapse lg:hidden" [class.is-open]="open()">
+        <nav class="container-x flex flex-col pb-8 pt-2">
           @for (l of links; track l.path; let i = $index) {
             <a
               [routerLink]="l.path"
               (click)="close()"
               routerLinkActive="text-gold-700"
               [routerLinkActiveOptions]="{ exact: l.path === '/' }"
-              class="mm-link w-full border-b border-gray-300/90 py-5 text-center font-display text-3xl text-ink-900 transition-colors hover:text-gold-600"
-              [style.transition-delay]="open() ? 120 + i * 55 + 'ms' : '0ms'"
+              class="mm-link border-b border-cream-300/70 py-4 text-center font-display text-2xl text-ink-900 transition-colors hover:text-gold-600"
+              [style.transition-delay]="open() ? 80 + i * 50 + 'ms' : '0ms'"
             >
               {{ l.label }}
             </a>
           }
-        </nav>
-
-        <div
-          class="mm-link mt-10 flex justify-center"
-          [style.transition-delay]="
-            open() ? 120 + links.length * 55 + 'ms' : '0ms'
-          "
-        >
-          <a
-            routerLink="/rezervari"
-            (click)="close()"
-            class="btn btn-gold px-10"
+          <div
+            class="mm-link mt-6 flex justify-center"
+            [style.transition-delay]="open() ? 80 + links.length * 50 + 'ms' : '0ms'"
           >
-            Verifică disponibilitatea
-          </a>
-        </div>
+            <a routerLink="/rezervari" (click)="close()" class="btn btn-gold px-10">
+              Verifică disponibilitatea
+            </a>
+          </div>
+        </nav>
       </div>
-    </div>
+
+      <!-- Scroll progress -->
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+      </div>
+    </header>
   `,
   styles: [
     `
-      /* Permanent, very soft top scrim — keeps the bar legible over bright hero
-       imagery without looking like a solid bar at the top of the page. */
-      .nav-scrim {
+      :host { display: contents; }
+
+      /* ===== Surface: scrim normally, solid when scrolled/open ===== */
+      .nav-surface {
         position: absolute;
         inset: 0;
         background: linear-gradient(
@@ -136,105 +124,82 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
         );
         backdrop-filter: blur(3px);
         pointer-events: none;
-        transition:
-          opacity 0.5s ease,
-          background 0.5s ease;
+        transition: background 0.5s ease, box-shadow 0.5s ease, backdrop-filter 0.5s ease;
       }
-      /* Once scrolled, become a refined frosted bar with a hairline gold edge */
-      header.scrolled .nav-scrim {
-        background: rgba(255, 253, 250, 0.9);
+      header.scrolled .nav-surface,
+      header.is-open .nav-surface {
+        background: rgba(255, 253, 250, 0.95);
         backdrop-filter: blur(18px) saturate(150%);
-        box-shadow: 0 14px 40px -26px rgba(94, 75, 35, 0.55);
+        box-shadow: 0 18px 50px -28px rgba(94, 75, 35, 0.55);
       }
-      header.scrolled .nav-scrim::after {
+      header.is-open .nav-surface {
+        border-radius: 0 0 26px 26px;
+      }
+      header.scrolled .nav-surface::after {
         content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(205, 162, 75, 0.5) 50%,
-          transparent
-        );
+        position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(205, 162, 75, 0.5) 50%, transparent);
       }
+      header.is-open .nav-surface::after { opacity: 0; }
 
-      /* Gold wordmark logo — soft shadow keeps it legible on light hero imagery */
-      .brand-logo {
-        filter: drop-shadow(0 1px 6px rgba(120, 90, 30, 0.35));
+      .brand-logo { filter: drop-shadow(0 1px 6px rgba(120, 90, 30, 0.35)); }
+
+      /* ===== Animated hamburger ===== */
+      .burger__box {
+        position: relative; display: block; width: 24px; height: 16px;
       }
+      .burger__line {
+        position: absolute; left: 0; height: 2px; width: 100%;
+        background: #241f19; border-radius: 2px;
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+      }
+      .burger__line:nth-child(1) { top: 0; }
+      .burger__line:nth-child(2) { top: 7px; }
+      .burger__line:nth-child(3) { top: 14px; }
+      .burger.is-open .burger__line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      .burger.is-open .burger__line:nth-child(2) { opacity: 0; transform: translateX(-8px); }
+      .burger.is-open .burger__line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-      .progress-track {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 2px;
-        background: rgba(110, 81, 33, 0.08);
+      /* ===== Expanding collapse panel ===== */
+      .nav-collapse {
+        position: relative;
+        display: grid;
+        grid-template-rows: 0fr;
         opacity: 0;
-        transition: opacity 0.4s ease;
+        transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
       }
-      header.scrolled .progress-track {
-        opacity: 1;
+      .nav-collapse > nav { overflow: hidden; min-height: 0; }
+      .nav-collapse.is-open { grid-template-rows: 1fr; opacity: 1; }
+
+      .mm-link {
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 0.45s ease, transform 0.45s ease, color 0.3s ease;
       }
+      .nav-collapse.is-open .mm-link { opacity: 1; transform: translateY(0); }
+
+      /* ===== Page backdrop ===== */
+      .menu-backdrop--hide { opacity: 0; pointer-events: none; transition: opacity 0.45s ease; }
+      .menu-backdrop--show {
+        opacity: 1; pointer-events: auto;
+        background: rgba(40, 30, 16, 0.28);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        transition: opacity 0.45s ease;
+      }
+
+      /* ===== Progress bar ===== */
+      .progress-track {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+        background: rgba(110, 81, 33, 0.08);
+        opacity: 0; transition: opacity 0.4s ease;
+      }
+      header.scrolled .progress-track { opacity: 1; }
+      header.is-open .progress-track { opacity: 0; }
       .progress-fill {
         height: 100%;
         background: linear-gradient(90deg, #b68a36, #e4c071);
         transition: width 0.12s linear;
-      }
-
-      /* ===== Mobile menu ===== */
-      .mobile-menu {
-        position: fixed;
-        inset: 0;
-        z-index: 45;
-        /* Light, low-opacity tint + page-wide blur; text stays readable on the panel */
-        background: rgba(40, 30, 16, 0.18);
-        backdrop-filter: blur(8px) saturate(50%);
-        -webkit-backdrop-filter: blur(8px) saturate(50%);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.45s ease;
-      }
-      .mobile-menu.is-open {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      /* Panel drops in from the top — translucent, with strong blur so the
-       text stays crisp while the page shows through underneath. */
-      .mobile-menu__panel {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        padding: 20px 28px 44px;
-        background: rgba(255, 253, 250, 0.92);
-        backdrop-filter: blur(22px) saturate(150%);
-        -webkit-backdrop-filter: blur(22px) saturate(150%);
-        border-radius: 0 0 28px 28px;
-        box-shadow: 0 30px 70px -30px rgba(40, 30, 12, 0.55);
-        transform: translateY(-104%);
-        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      .mobile-menu.is-open .mobile-menu__panel {
-        transform: translateY(0);
-      }
-
-      /* Links fade/slide in (staggered via inline transition-delay) */
-      .mm-link {
-        opacity: 0;
-        transform: translateY(-10px);
-        transition:
-          opacity 0.45s ease,
-          transform 0.45s ease,
-          color 0.3s ease;
-      }
-      .mobile-menu.is-open .mm-link {
-        opacity: 1;
-        transform: translateY(0);
       }
     `,
   ],
