@@ -43,8 +43,7 @@ import { FloralCornerComponent } from '../../../shared/components/floral-corner.
             </span>
 
             <div class="absolute inset-x-0 bottom-0 p-7 sm:p-9" style="text-shadow:0 2px 18px rgba(0,0,0,.6)">
-              <p class="text-xs font-medium uppercase tracking-widest2 text-gold-200">{{ tent.tag }}</p>
-              <h3 class="mt-2 font-display text-4xl text-cream-50 sm:text-5xl">{{ tent.title }}</h3>
+              <h3 class="font-display text-4xl text-cream-50 sm:text-5xl">{{ tent.title }}</h3>
               <p class="mt-3 max-w-lg text-sm leading-relaxed text-cream-50 sm:text-base">{{ tent.desc }}</p>
 
               <ul class="mt-5 flex flex-wrap gap-2">
