@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, effect, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IMAGES } from '../../../shared/data/images';
 import { AppStateService } from '../../../core/services/app-state.service';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 
@@ -77,8 +76,10 @@ import { ParallaxDirective } from '../../../shared/directives/parallax.directive
 
     .petal {
       position: absolute; top: -5%;
-      width: 12px; height: 12px; border-radius: 0 60% 0 60%;
-      background: rgba(255, 240, 205, .55);
+      /* Responsive size — grows on wider screens */
+      width: clamp(12px, 1.4vw, 26px); height: clamp(12px, 1.4vw, 26px);
+      border-radius: 80% 10% 80% 10%;
+      background: rgba(231, 194, 182, .6);
       animation-name: petal-fall; animation-timing-function: linear; animation-iteration-count: infinite;
     }
     @keyframes petal-fall {
@@ -109,7 +110,7 @@ export class HeroSectionComponent implements AfterViewInit {
   private readonly content = viewChild<ElementRef<HTMLElement>>('content');
   private viewReady = false;
 
-  readonly hero = IMAGES.heroLake;
+  readonly hero = '/hero/hero.png';
   readonly petals = Array.from({ length: 16 }, () => ({
     l: Math.round(Math.random() * 100),
     d: +(Math.random() * 8).toFixed(1),

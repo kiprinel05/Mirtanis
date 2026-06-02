@@ -38,7 +38,7 @@ import { RouterLink } from "@angular/router";
             <div>
               <h4 class="mb-3 text-xs uppercase tracking-widest2 text-gold-200">Contact</h4>
               <ul class="space-y-2.5 text-sm text-cream-100/75">
-                <li>Malul Lacului, România</li>
+                <li>Barcea, Galați · Mihai Eminescu 37</li>
                 <li><a href="tel:+407XXXXXXXX" class="transition-colors hover:text-gold-200">+40 7XX XXX XXX</a></li>
                 <li><a href="mailto:contact@mirtanis.ro" class="break-all transition-colors hover:text-gold-200">contact&#64;mirtanis.ro</a></li>
               </ul>

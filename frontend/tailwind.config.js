@@ -62,8 +62,8 @@ module.exports = {
         }
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        display: ['"Fraunces"', 'Georgia', 'serif'],
+        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
         script: ['"Great Vibes"', 'cursive']
       },
       letterSpacing: {

@@ -22,11 +22,17 @@ import { IMAGES } from '../../../shared/data/images';
         <h2 class="mx-auto mt-4 max-w-3xl font-display text-4xl text-cream-50 sm:text-5xl lg:text-6xl" appReveal="blur" [revealDelay]="100">
           Când apa oglindește lumina, fiecare clipă devine memorabilă
         </h2>
+        <div class="leaf-divider mt-7" appReveal="up" [revealDelay]="150">
+          <span class="!bg-cream-50/40"></span><span class="mi text-[18px] text-gold-200">water_drop</span><span class="!bg-cream-50/40"></span>
+        </div>
 
-        <div class="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-8 sm:grid-cols-4"
-             appReveal="up" [revealStagger]="120" [revealDelay]="150">
+        <div class="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4"
+             appReveal="up" [revealStagger]="120" [revealDelay]="200">
           @for (s of stats; track s.label) {
-            <div>
+            <div class="flex flex-col items-center">
+              <span class="mb-3 grid h-12 w-12 place-items-center rounded-full border border-gold-200/40 bg-cream-50/10 text-gold-200 backdrop-blur-sm">
+                <span class="mi text-[24px]">{{ s.icon }}</span>
+              </span>
               <p class="font-display text-4xl text-gold-200 sm:text-5xl"
                  [countUp]="s.value" [countSuffix]="s.suffix"></p>
               <p class="mt-2 text-xs uppercase tracking-widest2 text-cream-100/75">{{ s.label }}</p>
@@ -40,9 +46,9 @@ import { IMAGES } from '../../../shared/data/images';
 export class LakeSectionComponent {
   readonly bg = IMAGES.lakeSunset;
   readonly stats = [
-    { value: 1000, suffix: '+', label: 'Evenimente' },
-    { value: 200, suffix: '', label: 'Invitați capacitate' },
-    { value: 98, suffix: '%', label: 'Recomandă' },
-    { value: 20, suffix: '+', label: 'Ani experiență' }
+    { value: 1000, suffix: '+', label: 'Evenimente', icon: 'celebration' },
+    { value: 200, suffix: '', label: 'Invitați capacitate', icon: 'groups' },
+    { value: 98, suffix: '%', label: 'Recomandă', icon: 'favorite' },
+    { value: 15, suffix: '+', label: 'Ani experiență', icon: 'workspace_premium' }
   ];
 }

@@ -9,6 +9,7 @@ from app.core.deps import get_current_admin
 from app.database import get_db
 from app.models.gallery import GalleryCategory, GalleryImage
 from app.schemas.gallery import GalleryImageOut, GalleryImageUpdate
+from app.utils import r2
 
 router = APIRouter(prefix="/gallery", tags=["gallery"])
 
@@ -20,6 +21,10 @@ def list_images(
     category: Optional[GalleryCategory] = None,
     db: Session = Depends(get_db),
 ):
+    # When R2 is configured, the public gallery is served straight from the bucket.
+    if settings.r2_enabled:
+        return r2.list_gallery()
+
     q = db.query(GalleryImage).filter(GalleryImage.is_published == True)  # noqa: E712
     if category:
         q = q.filter(GalleryImage.category == category)

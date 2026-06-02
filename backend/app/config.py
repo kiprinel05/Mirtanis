@@ -25,9 +25,30 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_MB: int = 15
 
+    # --- Cloudflare R2 (S3-compatible) gallery source ---
+    # When all of these are set, the public gallery is served from the R2
+    # bucket instead of the local DB. Images may be organised in folders named
+    # after a category (e.g. "nunti/photo.jpg") to enable filtering.
+    R2_ACCOUNT_ID: str = ""
+    R2_ACCESS_KEY_ID: str = ""
+    R2_SECRET_ACCESS_KEY: str = ""
+    R2_BUCKET: str = ""
+    R2_PUBLIC_BASE: str = ""   # e.g. https://pub-xxxx.r2.dev or https://galerie.mirtanis.ro
+    R2_PREFIX: str = ""        # optional sub-folder to list, e.g. "gallery/"
+
     @property
     def cors_origins_list(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
+    @property
+    def r2_enabled(self) -> bool:
+        return bool(
+            self.R2_ACCOUNT_ID
+            and self.R2_ACCESS_KEY_ID
+            and self.R2_SECRET_ACCESS_KEY
+            and self.R2_BUCKET
+            and self.R2_PUBLIC_BASE
+        )
 
 
 @lru_cache

@@ -3,15 +3,18 @@ import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 import { TiltDirective } from '../../../shared/directives/tilt.directive';
+import { FloralCornerComponent } from '../../../shared/components/floral-corner.component';
 import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-story-section',
   standalone: true,
-  imports: [RouterLink, RevealDirective, ParallaxDirective, TiltDirective],
+  imports: [RouterLink, RevealDirective, ParallaxDirective, TiltDirective, FloralCornerComponent],
   template: `
-    <section class="section bg-cream-fade">
-      <div class="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+    <section class="section relative overflow-hidden">
+      <app-floral-corner corner="tl" variant="eucalyptus" [size]="200" />
+      <app-floral-corner corner="br" variant="rose" [size]="190" />
+      <div class="container-x relative grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
         <!-- Images -->
         <div class="relative" appReveal="left">
           <div appTilt class="img-cine gold-frame aspect-[4/5] overflow-hidden rounded-3xl shadow-card">
@@ -28,12 +31,12 @@ import { IMAGES } from '../../../shared/data/images';
         <div appReveal="right">
           <p class="eyebrow">Povestea noastră</p>
           <h2 class="mt-4 font-display text-4xl text-ink-900 sm:text-5xl">
-            Un loc gândit pentru <span class="gold-text">momentele care contează</span>
+            Nuntă pe lac — <span class="gold-text">emoție și natură</span>
           </h2>
           <p class="mt-6 text-lg leading-relaxed text-ink-600">
-            La Mirtanis Events, fiecare detaliu este atins de lumina caldă a apusului peste lac.
-            De la cortul premium cu vedere panoramică până la sala interioară elegantă,
-            am creat un cadru în care emoția curge firesc, iar invitații se simt acasă.
+            La Mirtanis Events totul se bazează pe poveste, nu pe opulență. Lacul, lumina
+            caldă a apusului și natura din jur creează un ambient firesc, în care emoția
+            curge de la sine, iar invitații se simt acasă.
           </p>
           <ul class="mt-8 space-y-4" appReveal="up" [revealStagger]="90" [revealDelay]="150">
             @for (f of features; track f) {
