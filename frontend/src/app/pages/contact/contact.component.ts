@@ -3,7 +3,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { PageHeaderComponent } from "../../shared/components/page-header.component";
 import { RevealDirective } from "../../shared/directives/reveal.directive";
 import { ContactService } from "../../core/services/contact.service";
-import { IMAGES } from "../../shared/data/images";
 
 @Component({
   selector: "app-contact",
@@ -168,7 +167,7 @@ export class ContactComponent {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ContactService);
 
-  readonly headerImg = IMAGES.lakeReflect;
+  readonly headerImg = '/contact/hero.jpg';
   readonly loading = signal(false);
   readonly success = signal(false);
   readonly error = signal<string | null>(null);
@@ -177,14 +176,14 @@ export class ContactComponent {
     {
       icon: "mail",
       label: "Email",
-      value: "contact@mirtanis.ro",
-      href: "mailto:contact@mirtanis.ro",
+      value: "contact@mirtanisevents.ro",
+      href: "mailto:contact@mirtanisevents.ro",
     },
     {
       icon: "call",
       label: "Telefon",
-      value: "+40 7XX XXX XXX",
-      href: "tel:+407XXXXXXXX",
+      value: "+40 767 690 552",
+      href: "tel:+40767690552",
     },
     {
       icon: "location_on",

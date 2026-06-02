@@ -4,7 +4,6 @@ import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 import { TiltDirective } from '../../../shared/directives/tilt.directive';
 import { FloralCornerComponent } from '../../../shared/components/floral-corner.component';
-import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-story-section',
@@ -53,8 +52,8 @@ import { IMAGES } from '../../../shared/data/images';
   `
 })
 export class StorySectionComponent {
-  readonly main = IMAGES.storyTable;
-  readonly detail = IMAGES.storyDetails;
+  readonly main = '/home/our-story/main.jpg';
+  readonly detail = '/home/our-story/second.jpg';
   readonly features = [
     'Priveliște deschisă către lac, perfectă pentru ceremonii în aer liber',
     'Cort premium și sală interioară, pentru orice anotimp',

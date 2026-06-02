@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { CountUpDirective } from '../../../shared/directives/count-up.directive';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
-import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-lake-section',
@@ -44,7 +43,7 @@ import { IMAGES } from '../../../shared/data/images';
   `
 })
 export class LakeSectionComponent {
-  readonly bg = IMAGES.lakeSunset;
+  readonly bg = '/home/lake/lake.jpg';
   readonly stats = [
     { value: 1000, suffix: '+', label: 'Evenimente', icon: 'celebration' },
     { value: 200, suffix: '', label: 'Invitați capacitate', icon: 'groups' },

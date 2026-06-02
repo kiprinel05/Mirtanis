@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 720
 
-    ADMIN_EMAIL: str = "admin@mirtanis.ro"
+    ADMIN_EMAIL: str = "admin@mirtanisevents.ro"
     ADMIN_PASSWORD: str = "ChangeMeNow!2026"
 
     CORS_ORIGINS: str = "http://localhost:4200"

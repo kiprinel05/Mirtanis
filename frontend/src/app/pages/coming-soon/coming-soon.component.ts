@@ -50,7 +50,7 @@ import { dismissBootLoader } from "../../shared/boot-loader";
         <div class="relative cs-line" style="animation-delay:.45s">
           <span class="logo-halo"></span>
           <img
-            src="/logo-gold-v2.png"
+            src="/logo-mare-color.png"
             alt="Mirtanis Events"
             class="relative w-[300px] max-w-[80vw] sm:w-[420px]"
             style="filter: drop-shadow(0 8px 26px rgba(0,0,0,.45));"

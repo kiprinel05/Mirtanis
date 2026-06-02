@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
-import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-cta-section',
@@ -38,5 +37,5 @@ import { IMAGES } from '../../../shared/data/images';
   `
 })
 export class CtaSectionComponent {
-  readonly bg = IMAGES.lakeSunset;
+  readonly bg = '/home/cta/cta.jpg';
 }

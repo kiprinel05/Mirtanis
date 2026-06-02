@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { FloralCornerComponent } from '../../shared/components/floral-corner.component';
-import { IMAGES } from '../../shared/data/images';
 
 @Component({
   selector: 'app-locations',
@@ -112,8 +111,8 @@ import { IMAGES } from '../../shared/data/images';
   `
 })
 export class LocationsComponent {
-  readonly headerImg = IMAGES.tentExterior;
-  readonly ctaImg = IMAGES.lakeSunset;
+  readonly headerImg = '/locations/hero.jpg';
+  readonly ctaImg = '/locations/hero.jpg';
 
   readonly tent = {
     tag: 'În aer liber · pe malul lacului',
@@ -127,7 +126,7 @@ export class LocationsComponent {
       'Acces direct la ponton',
       'Climatizare pentru sezonul cald'
     ],
-    images: [IMAGES.tentExterior, IMAGES.ceremonyChairs, IMAGES.stringLights]
+    images: ['/locations/cort/main.jpg', '/locations/cort/second1.jpg', '/locations/cort/second2.jpg']
   };
 
   readonly hall = {
@@ -135,6 +134,6 @@ export class LocationsComponent {
     capacity: 'până la 100 invitați',
     desc: 'Pe timpul iernii, când cortul nu este potrivit, sala interioară este alegerea caldă și sigură — un spațiu intim, climatizat, cu decor personalizabil după dorința voastră.',
     features: ['Climatizare completă', 'Decor personalizabil'],
-    images: [IMAGES.hallInterior, IMAGES.tentInterior, IMAGES.champagne]
+    images: ['/locations/local/local.jpg']
   };
 }

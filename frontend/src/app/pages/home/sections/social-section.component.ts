@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { FloralCornerComponent } from '../../../shared/components/floral-corner.component';
-import { IMAGES } from '../../../shared/data/images';
 
 interface Post { img: string; url: string; network: 'instagram' | 'facebook'; }
 
@@ -64,11 +63,11 @@ export class SocialSectionComponent {
   readonly facebook = 'https://www.facebook.com/mirtanisevents/';
 
   readonly posts: Post[] = [
-    { img: IMAGES.gallery[0], url: this.instagram, network: 'instagram' },
-    { img: IMAGES.gallery[4], url: this.facebook, network: 'facebook' },
-    { img: IMAGES.gallery[2], url: this.instagram, network: 'instagram' },
-    { img: IMAGES.gallery[8], url: this.facebook, network: 'facebook' },
-    { img: IMAGES.gallery[3], url: this.instagram, network: 'instagram' },
-    { img: IMAGES.gallery[6], url: this.facebook, network: 'facebook' }
+    { img: '/home/media/1.jpg', url: this.instagram, network: 'instagram' },
+    { img: '/home/media/2.jpg', url: this.facebook, network: 'facebook' },
+    { img: '/home/media/3.jpg', url: this.instagram, network: 'instagram' },
+    { img: '/home/media/4.jpg', url: this.facebook, network: 'facebook' },
+    { img: '/home/media/5.jpg', url: this.instagram, network: 'instagram' },
+    { img: '/home/media/6.jpg', url: this.facebook, network: 'facebook' }
   ];
 }

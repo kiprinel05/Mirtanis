@@ -35,7 +35,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           (click)="close()"
         >
           <img
-            src="/logo-mare-v2.png"
+            src="/logo-mare-black.png"
             alt="Mirtanis Events"
             class="brand-logo h-11 w-auto transition-all duration-300 group-hover:scale-[1.03]"
             [class.sm:h-10]="scrolled()"

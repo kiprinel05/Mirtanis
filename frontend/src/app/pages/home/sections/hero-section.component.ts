@@ -31,9 +31,9 @@ import { ParallaxDirective } from '../../../shared/directives/parallax.directive
       <!-- Content -->
       <div #content class="container-x relative z-10 text-center" style="text-shadow: 0 2px 30px rgba(30,22,10,0.35);">
         <p class="hero-line script text-3xl text-gold-100 sm:text-4xl">Bine ați venit la</p>
-        <h1 class="hero-line mt-3 font-display text-6xl font-semibold leading-[1.0] text-cream-50 sm:text-7xl lg:text-[7.5rem]">
-          Mirtanis <span class="gold-text-bright gold-shimmer">Events</span>
-        </h1>
+        <img src="/logo-mare-color.png" alt="Mirtanis Events"
+             class="hero-line mx-auto mt-4 w-[clamp(280px,52vw,640px)] drop-shadow-[0_6px_30px_rgba(30,22,10,0.45)]" />
+        <h1 class="sr-only">Mirtanis Events</h1>
         <div class="hero-line mx-auto mt-6 flex max-w-md items-center justify-center gap-4 text-cream-50/90">
           <span class="h-px w-10 bg-cream-50/50"></span>
           <span class="text-xs uppercase tracking-widest2">Locație de poveste pe lac</span>

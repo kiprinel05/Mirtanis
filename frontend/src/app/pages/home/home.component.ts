@@ -9,6 +9,7 @@ import { SocialSectionComponent } from './sections/social-section.component';
 import { TestimonialsSectionComponent } from './sections/testimonials-section.component';
 import { FaqSectionComponent } from './sections/faq-section.component';
 import { CtaSectionComponent } from './sections/cta-section.component';
+import { FloralDividerComponent } from '../../shared/components/floral-divider.component';
 
 @Component({
   selector: 'app-home',
@@ -23,18 +24,21 @@ import { CtaSectionComponent } from './sections/cta-section.component';
     SocialSectionComponent,
     TestimonialsSectionComponent,
     FaqSectionComponent,
-    CtaSectionComponent
+    CtaSectionComponent,
+    FloralDividerComponent
   ],
   template: `
     <div class="relative">
       <app-hero-section />
       <app-story-section />
       <app-services-section />
+      <app-floral-divider />
       <app-locations-section />
       <app-lake-section />
       <app-gallery-preview />
       <app-social-section />
       <app-testimonials-section />
+      <app-floral-divider />
       <app-faq-section />
       <app-cta-section />
     </div>

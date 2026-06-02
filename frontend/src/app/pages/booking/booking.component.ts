@@ -5,7 +5,6 @@ import { AvailabilityCalendarComponent } from './components/availability-calenda
 import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { BookingService } from '../../core/services/booking.service';
 import { DayStatus, EventType, Venue } from '../../core/models/api.models';
-import { IMAGES } from '../../shared/data/images';
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'nunta', label: 'Nuntă' },
@@ -197,7 +196,7 @@ export class BookingComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(BookingService);
 
-  readonly headerImg = IMAGES.ceremonyChairs;
+  readonly headerImg = '/rezervari/hero.jpg';
   readonly eventTypes = EVENT_TYPES;
   readonly venues = VENUES;
   readonly stepLabels = ['Eveniment', 'Contact', 'Confirmare'];

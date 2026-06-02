@@ -68,7 +68,7 @@ const RATIOS = ['3 / 4', '1 / 1', '4 / 5', '4 / 3', '3 / 4', '1 / 1', '5 / 4', '
 export class GalleryComponent implements OnInit {
   private readonly api = inject(GalleryService);
 
-  readonly headerImg = IMAGES.heroAlt;
+  readonly headerImg = '/galerie/hero.jpg';
   readonly skeletons = [240, 320, 280, 360, 220, 300, 260, 340, 300];
 
   readonly photos = signal<Photo[]>([]);

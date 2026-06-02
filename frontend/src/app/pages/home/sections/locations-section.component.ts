@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 import { FloralCornerComponent } from '../../../shared/components/floral-corner.component';
-import { IMAGES } from '../../../shared/data/images';
 
 @Component({
   selector: 'app-locations-section',
@@ -87,7 +86,7 @@ export class LocationsSectionComponent {
   readonly tent = {
     title: 'Cort Premium pe Lac',
     tag: 'În aer liber · pe malul lacului',
-    img: IMAGES.tentExterior,
+    img: '/home/location/cort.jpg',
     desc: 'Structură elegantă cu pereți transparenți, deschisă spre apă și cer. Ziua, lumina naturală se revarsă înăuntru; seara, ghirlandele aurii transformă totul într-un decor de basm — emoție pură, sub stele.',
     features: [
       { icon: 'waves', label: 'Vedere la lac' },
@@ -99,7 +98,7 @@ export class LocationsSectionComponent {
 
   readonly hall = {
     title: 'Sala Interioară',
-    img: IMAGES.hallInterior,
+    img: '/home/location/local.jpg',
     desc: 'Pentru sezonul rece sau evenimente intime — un spațiu rafinat, climatizat, gata oricând să te primească.'
   };
 }

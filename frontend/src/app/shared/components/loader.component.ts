@@ -31,8 +31,7 @@ import { dismissBootLoader } from '../boot-loader';
               <circle cx="120" cy="120" r="116" class="loader__ring-track" />
               <circle cx="120" cy="120" r="116" class="loader__ring-arc" />
             </svg>
-            <span class="loader__glow"></span>
-            <img src="/logo-mare-v2.png" alt="Mirtanis Events" class="loader__logo" />
+            <img src="/logo-mare-color.png" alt="Mirtanis Events" class="loader__logo" />
           </div>
 
           <div class="loader__bar"><span class="loader__bar-fill"></span></div>
@@ -91,24 +90,12 @@ import { dismissBootLoader } from '../boot-loader';
     }
     @keyframes ring-spin { to { stroke-dashoffset: -849; } }
 
-    .loader__glow {
-      position: absolute; width: 62%; height: 62%; border-radius: 50%;
-      background: radial-gradient(circle, rgba(233,209,153,.55), rgba(233,209,153,0) 70%);
-      filter: blur(22px);
-      animation: glow-pulse 3s ease-in-out infinite;
-    }
-    @keyframes glow-pulse {
-      0%,100% { opacity: .45; transform: scale(.92); }
-      50%     { opacity: .8;  transform: scale(1.08); }
-    }
-
     .loader__logo {
       position: relative; z-index: 1;
       width: 200px; max-width: 56vw; height: auto;
       opacity: 0;
       animation: logo-in 1.1s cubic-bezier(.22,1,.36,1) .15s forwards,
                  logo-float 5s ease-in-out 1.2s infinite;
-      filter: drop-shadow(0 8px 24px rgba(154,114,46,.25));
     }
     @keyframes logo-in {
       from { opacity: 0; transform: translateY(14px) scale(.95); }
