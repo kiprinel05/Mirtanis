@@ -6,13 +6,13 @@ from app.models.gallery import GalleryCategory
 
 class GalleryImageOut(BaseModel):
     id: int
-    title: Optional[str]
+    title: Optional[str] = None
     url: str
-    thumbnail_url: Optional[str]
-    category: GalleryCategory
-    sort_order: int
-    is_published: bool
-    created_at: datetime
+    thumbnail_url: Optional[str] = None
+    category: Optional[GalleryCategory] = None
+    sort_order: int = 0
+    is_published: bool = True
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

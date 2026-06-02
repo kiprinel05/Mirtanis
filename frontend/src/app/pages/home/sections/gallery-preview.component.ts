@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
+import { GalleryService } from '../../../core/services/gallery.service';
+import { GalleryImage } from '../../../core/models/api.models';
 import { IMAGES } from '../../../shared/data/images';
+
+interface Tile { src: string; wide: boolean; tall: boolean; }
 
 @Component({
   selector: 'app-gallery-preview',
@@ -22,7 +26,7 @@ import { IMAGES } from '../../../shared/data/images';
         <!-- Editorial mosaic -->
         <div class="mt-12 grid auto-rows-[180px] grid-cols-2 gap-4 sm:auto-rows-[220px] lg:grid-cols-4"
              appReveal="up" [revealStagger]="80">
-          @for (g of tiles; track g.src; let i = $index) {
+          @for (g of tiles(); track $index) {
             <a routerLink="/galerie"
                class="img-cine group relative block overflow-hidden rounded-2xl shadow-soft"
                [class.col-span-2]="g.wide" [class.row-span-2]="g.tall">
@@ -38,13 +42,33 @@ import { IMAGES } from '../../../shared/data/images';
     </section>
   `
 })
-export class GalleryPreviewComponent {
-  readonly tiles = [
-    { src: IMAGES.gallery[4], wide: false, tall: true },
-    { src: IMAGES.gallery[0], wide: false, tall: false },
-    { src: IMAGES.gallery[2], wide: false, tall: false },
-    { src: IMAGES.gallery[8], wide: false, tall: true },
-    { src: IMAGES.gallery[3], wide: false, tall: false },
-    { src: IMAGES.gallery[6], wide: false, tall: false }
+export class GalleryPreviewComponent implements OnInit {
+  private readonly api = inject(GalleryService);
+
+  // shape pattern for the 6-tile mosaic
+  private readonly shape = [
+    { wide: false, tall: true },
+    { wide: false, tall: false },
+    { wide: false, tall: false },
+    { wide: false, tall: true },
+    { wide: false, tall: false },
+    { wide: false, tall: false }
   ];
+
+  readonly tiles = signal<Tile[]>(this.build(IMAGES.gallery));
+
+  ngOnInit(): void {
+    this.api.list().subscribe({
+      next: (imgs: GalleryImage[]) => {
+        if (imgs && imgs.length) {
+          this.tiles.set(this.build(imgs.map((i) => this.api.resolveUrl(i.url))));
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  private build(urls: string[]): Tile[] {
+    return this.shape.map((s, i) => ({ src: urls[i % urls.length], ...s }));
+  }
 }

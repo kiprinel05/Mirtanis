@@ -1,22 +1,15 @@
-import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
 import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
 import { GalleryService } from '../../core/services/gallery.service';
-import { GalleryCategory, GalleryImage } from '../../core/models/api.models';
+import { GalleryImage } from '../../core/models/api.models';
 import { IMAGES } from '../../shared/data/images';
 
-interface Photo { url: string; title?: string | null; category: string; }
+interface Photo { url: string; title?: string | null; ratio: string; }
 
-const CATEGORIES: { key: GalleryCategory | 'all'; label: string }[] = [
-  { key: 'all', label: 'Toate' },
-  { key: 'nunti', label: 'Nunți' },
-  { key: 'botezuri', label: 'Botezuri' },
-  { key: 'petreceri', label: 'Petreceri' },
-  { key: 'cort', label: 'Cort' },
-  { key: 'sala', label: 'Sală' },
-  { key: 'lac', label: 'Lac' },
-  { key: 'exterior', label: 'Exterior' }
-];
+// Varied aspect ratios cycled per index → masonry look with space reserved
+// up-front, so the columns never reflow while images load.
+const RATIOS = ['3 / 4', '1 / 1', '4 / 5', '4 / 3', '3 / 4', '1 / 1', '5 / 4', '4 / 5'];
 
 @Component({
   selector: 'app-gallery',
@@ -31,39 +24,24 @@ const CATEGORIES: { key: GalleryCategory | 'all'; label: string }[] = [
 
     <section class="section">
       <div class="container-x">
-        <!-- Filters -->
-        <div class="mb-10 flex flex-wrap justify-center gap-2 sm:gap-3">
-          @for (c of categories; track c.key) {
-            <button (click)="select(c.key)"
-                    class="rounded-full border px-4 py-2 text-sm transition-all tap-highlight-none"
-                    [class.border-gold-500]="active() === c.key"
-                    [class.bg-gold-500]="active() === c.key"
-                    [class.text-cream-50]="active() === c.key"
-                    [class.border-cream-400]="active() !== c.key"
-                    [class.text-ink-600]="active() !== c.key"
-                    [class.hover:border-gold-400]="active() !== c.key">
-              {{ c.label }}
-            </button>
-          }
-        </div>
-
         @if (loading()) {
           <div class="columns-1 gap-4 sm:columns-2 lg:columns-3">
             @for (s of skeletons; track $index) {
               <div class="mb-4 animate-pulse rounded-2xl bg-cream-300" [style.height.px]="s"></div>
             }
           </div>
-        } @else if (filtered().length === 0) {
-          <p class="py-16 text-center text-ink-500">Nicio imagine în această categorie.</p>
+        } @else if (photos().length === 0) {
+          <p class="py-16 text-center text-ink-500">Galeria se actualizează în curând.</p>
         } @else {
-          <div class="columns-1 gap-4 sm:columns-2 lg:columns-3 [column-fill:_balance]"
-               appReveal="up" [revealStagger]="60">
-            @for (p of filtered(); track p.url; let i = $index) {
-              <figure class="img-cine group relative mb-4 break-inside-avoid cursor-pointer rounded-2xl shadow-soft"
+          <div class="columns-1 gap-4 sm:columns-2 lg:columns-3">
+            @for (p of photos(); track p.url; let i = $index) {
+              <figure class="img-cine group relative mb-4 break-inside-avoid cursor-pointer overflow-hidden rounded-2xl bg-cream-200 shadow-soft"
+                      [style.aspect-ratio]="p.ratio"
                       (click)="open(i)">
-                <img [src]="p.url" [alt]="p.title || 'Fotografie eveniment'" loading="lazy" class="w-full" />
-                <figcaption class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink-900/60 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
-                  <span class="text-sm text-cream-50">{{ p.title || labelFor(p.category) }}</span>
+                <img [src]="p.url" [alt]="p.title || 'Fotografie eveniment Mirtanis'" loading="lazy"
+                     class="h-full w-full object-cover" />
+                <figcaption class="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-ink-900/50 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                  <span class="text-sm text-cream-50">{{ p.title || 'Mirtanis Events' }}</span>
                 </figcaption>
               </figure>
             }
@@ -79,7 +57,7 @@ const CATEGORIES: { key: GalleryCategory | 'all'; label: string }[] = [
                 (click)="close(); $event.stopPropagation()" aria-label="Închide"><span class="mi text-[24px]">close</span></button>
         <button class="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-cream-50 hover:bg-cream-50/20 sm:left-8"
                 (click)="prev(); $event.stopPropagation()" aria-label="Anterioara"><span class="mi text-[28px]">chevron_left</span></button>
-        <img [src]="filtered()[lightbox()!].url" [alt]="filtered()[lightbox()!].title || ''"
+        <img [src]="photos()[lightbox()!].url" [alt]="photos()[lightbox()!].title || ''"
              class="max-h-[85vh] max-w-[92vw] rounded-2xl object-contain shadow-lift" (click)="$event.stopPropagation()" />
         <button class="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-cream-50/10 text-cream-50 hover:bg-cream-50/20 sm:right-8"
                 (click)="next(); $event.stopPropagation()" aria-label="Următoarea"><span class="mi text-[28px]">chevron_right</span></button>
@@ -91,28 +69,20 @@ export class GalleryComponent implements OnInit {
   private readonly api = inject(GalleryService);
 
   readonly headerImg = IMAGES.heroAlt;
-  readonly categories = CATEGORIES;
   readonly skeletons = [240, 320, 280, 360, 220, 300, 260, 340, 300];
 
   readonly photos = signal<Photo[]>([]);
-  readonly active = signal<GalleryCategory | 'all'>('all');
   readonly loading = signal(true);
   readonly lightbox = signal<number | null>(null);
-
-  readonly filtered = computed(() => {
-    const a = this.active();
-    const all = this.photos();
-    return a === 'all' ? all : all.filter((p) => p.category === a);
-  });
 
   ngOnInit(): void {
     this.api.list().subscribe({
       next: (imgs: GalleryImage[]) => {
         if (imgs && imgs.length) {
-          this.photos.set(imgs.map((i) => ({
-            url: this.api.resolveUrl(i.url),
-            title: i.title,
-            category: i.category
+          this.photos.set(imgs.map((img, i) => ({
+            url: this.api.resolveUrl(img.url),
+            title: img.title,
+            ratio: RATIOS[i % RATIOS.length]
           })));
         } else {
           this.photos.set(this.fallback());
@@ -124,20 +94,13 @@ export class GalleryComponent implements OnInit {
   }
 
   private fallback(): Photo[] {
-    const cats = ['nunti', 'botezuri', 'cort', 'sala', 'lac', 'exterior', 'petreceri'];
-    return IMAGES.gallery.map((url, i) => ({ url, category: cats[i % cats.length] }));
-  }
-
-  select(key: GalleryCategory | 'all'): void { this.active.set(key); }
-
-  labelFor(cat: string): string {
-    return CATEGORIES.find((c) => c.key === cat)?.label ?? 'Mirtanis Events';
+    return IMAGES.gallery.map((url, i) => ({ url, ratio: RATIOS[i % RATIOS.length] }));
   }
 
   open(i: number): void { this.lightbox.set(i); document.body.style.overflow = 'hidden'; }
   close(): void { this.lightbox.set(null); document.body.style.overflow = ''; }
-  next(): void { this.lightbox.update((v) => v === null ? v : (v + 1) % this.filtered().length); }
-  prev(): void { this.lightbox.update((v) => v === null ? v : (v - 1 + this.filtered().length) % this.filtered().length); }
+  next(): void { this.lightbox.update((v) => v === null ? v : (v + 1) % this.photos().length); }
+  prev(): void { this.lightbox.update((v) => v === null ? v : (v - 1 + this.photos().length) % this.photos().length); }
 
   @HostListener('document:keydown', ['$event'])
   onKey(e: KeyboardEvent): void {
