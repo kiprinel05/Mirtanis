@@ -95,10 +95,10 @@ export class RomanticBgComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Parallax only on HIGH (and never under reduced-motion). MEDIUM keeps the
-    // petals but leaves the layers static — cheaper, still pretty.
+    // Parallax only on HIGH. MEDIUM keeps the petals but leaves the layers
+    // static — cheaper, still pretty.
     if (typeof window === 'undefined') return;
-    if (!this.perf.isHigh() || this.perf.reducedMotion) return;
+    if (!this.perf.isHigh()) return;
     this.zone.runOutsideAngular(() => {
       window.addEventListener('scroll', this.onScroll, { passive: true });
     });

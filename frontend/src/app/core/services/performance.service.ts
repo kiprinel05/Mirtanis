@@ -165,7 +165,6 @@ export class PerformanceService {
     const el = document.documentElement;
     el.classList.remove('perf-low', 'perf-medium', 'perf-high');
     el.classList.add(`perf-${this.tier()}`);
-    if (this.reducedMotion) el.classList.add('perf-reduced');
   }
 
   // ---- cache ----------------------------------------------------------------
