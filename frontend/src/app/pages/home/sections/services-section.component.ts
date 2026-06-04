@@ -27,7 +27,7 @@ interface Service { icon: string; title: string; desc: string; }
         <div class="mx-auto mt-10 flex max-w-5xl flex-col gap-3 sm:mt-16 sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
              appReveal="up" [revealStagger]="80">
           @for (s of services; track s.title; let i = $index) {
-            <div class="svc group relative flex items-start gap-4 overflow-hidden rounded-2xl border border-cream-300/80 bg-cream-50/75 p-4 backdrop-blur-sm transition-all duration-500 hover:border-gold-300/70 hover:bg-cream-50 hover:shadow-soft sm:flex-col sm:gap-0 sm:rounded-3xl sm:p-7 sm:hover:-translate-y-2 sm:hover:shadow-card">
+            <div class="svc group relative flex items-start gap-4 overflow-hidden rounded-2xl border border-cream-300/80 bg-cream-50/95 p-4 transition-all duration-500 hover:border-gold-300/70 hover:bg-cream-50 hover:shadow-soft sm:flex-col sm:gap-0 sm:rounded-3xl sm:p-7 sm:hover:-translate-y-2 sm:hover:shadow-card">
               <!-- soft gradient glow on hover (desktop) -->
               <span class="pointer-events-none absolute -right-10 -top-10 hidden h-32 w-32 rounded-full bg-blush-100/60 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100 sm:block"></span>
               <!-- faint index number (desktop only) -->
@@ -47,7 +47,7 @@ interface Service { icon: string; title: string; desc: string; }
         </div>
 
         <!-- trust strip -->
-        <div class="mx-auto mt-12 flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-full border border-cream-300/70 bg-cream-50/60 px-7 py-4 text-center backdrop-blur-sm"
+        <div class="mx-auto mt-12 flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-full border border-cream-300/70 bg-cream-50/90 px-7 py-4 text-center"
              appReveal="up" [revealDelay]="120">
           @for (t of trust; track t.label) {
             <span class="inline-flex items-center gap-2 text-sm text-ink-700">

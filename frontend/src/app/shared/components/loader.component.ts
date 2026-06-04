@@ -181,10 +181,14 @@ export class LoaderComponent implements OnInit {
     // loader underneath it right away (it's hidden — no flash).
     dismissBootLoader();
 
-    const MIN_MS = 2000;
+    const MIN_MS = 1600;   // floor so the loader animation has time to play
+    const MAX_MS = 8000;   // hard safety cap — never trap the user
     const start = performance.now();
+    let done = false;
 
-    const finish = () => {
+    const reveal = () => {
+      if (done) return;
+      done = true;
       const wait = Math.max(0, MIN_MS - (performance.now() - start));
       setTimeout(() => {
         this.leaving.set(true);
@@ -193,9 +197,28 @@ export class LoaderComponent implements OnInit {
       }, wait);
     };
 
-    if (document.readyState === 'complete') finish();
-    else window.addEventListener('load', finish, { once: true });
+    // Wait for the things that actually make the hero look "ready":
+    //  1) the hero background image is fully decoded
+    //  2) web fonts are loaded (so the title/buttons render in final type)
+    //  3) the document has finished its initial load
+    const heroImg = new Image();
+    heroImg.src = '/hero/hero.png';
+    const imgReady = heroImg.decode
+      ? heroImg.decode().catch(() => {})
+      : new Promise<void>((res) => {
+          if (heroImg.complete) res();
+          else { heroImg.onload = () => res(); heroImg.onerror = () => res(); }
+        });
 
-    setTimeout(finish, 4500); // safety net
+    const fontsReady = (document as any).fonts?.ready ?? Promise.resolve();
+
+    const loadReady = document.readyState === 'complete'
+      ? Promise.resolve()
+      : new Promise<void>((res) => window.addEventListener('load', () => res(), { once: true }));
+
+    Promise.all([imgReady, fontsReady, loadReady]).then(reveal);
+
+    // Absolute fallback: if something hangs, reveal anyway.
+    setTimeout(reveal, MAX_MS);
   }
 }

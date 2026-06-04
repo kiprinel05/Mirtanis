@@ -1,8 +1,9 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_admin
+from app.core.ratelimit import limiter
 from app.database import get_db
 from app.models.contact import ContactMessage
 from app.schemas.contact import ContactCreate, ContactOut
@@ -11,7 +12,8 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 
 
 @router.post("", response_model=ContactOut, status_code=status.HTTP_201_CREATED)
-def create_message(payload: ContactCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute;30/day")
+def create_message(request: Request, payload: ContactCreate, db: Session = Depends(get_db)):
     msg = ContactMessage(**payload.model_dump())
     db.add(msg)
     db.commit()

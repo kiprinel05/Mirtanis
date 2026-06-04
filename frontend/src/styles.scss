@@ -264,89 +264,51 @@
    ============================================================ */
 .romance-bg {
   position: fixed; inset: 0; z-index: -1; overflow: hidden;
+  /* Static layered gradient: the soft blush "blobs" are baked into the
+     background image, so there are zero animated/blurred layers to composite. */
   background:
+    radial-gradient(42vw 42vw at 4% -4%, rgba(216,165,147,.28), transparent 62%),
+    radial-gradient(48vw 48vw at 98% 26%, rgba(244,222,215,.42), transparent 62%),
+    radial-gradient(38vw 38vw at 16% 104%, rgba(231,194,182,.26), transparent 62%),
     linear-gradient(180deg, #fffefc 0%, #fdf6f4 45%, #fbf1ee 100%);
 }
-/* slowly drifting blush aurora blobs */
+/* Two very light blobs kept for the scroll-parallax accent (no animation, smaller blur). */
 .romance-bg__blob {
   position: absolute; border-radius: 50%;
-  filter: blur(70px); opacity: .55;
-  will-change: transform;
+  filter: blur(48px); opacity: .4;
 }
 .romance-bg__blob--1 {
-  width: 46vw; height: 46vw; left: -8vw; top: -6vw;
-  background: radial-gradient(circle, rgba(216,165,147,.45), transparent 65%);
-  animation: blob-a 22s ease-in-out infinite;
+  width: 40vw; height: 40vw; left: -8vw; top: -6vw;
+  background: radial-gradient(circle, rgba(216,165,147,.4), transparent 65%);
 }
 .romance-bg__blob--2 {
-  width: 52vw; height: 52vw; right: -12vw; top: 22vh;
-  background: radial-gradient(circle, rgba(244,222,215,.7), transparent 65%);
-  animation: blob-b 28s ease-in-out infinite;
+  width: 44vw; height: 44vw; right: -12vw; top: 30vh;
+  background: radial-gradient(circle, rgba(233,209,153,.32), transparent 65%);
 }
-.romance-bg__blob--3 {
-  width: 40vw; height: 40vw; left: 12vw; bottom: -10vw;
-  background: radial-gradient(circle, rgba(231,194,182,.4), transparent 65%);
-  animation: blob-a 26s ease-in-out infinite reverse;
-}
-.romance-bg__blob--4 {
-  width: 34vw; height: 34vw; right: 8vw; bottom: 6vh;
-  background: radial-gradient(circle, rgba(233,209,153,.28), transparent 65%);
-  animation: blob-b 32s ease-in-out infinite reverse;
-}
-@keyframes blob-a {
-  0%,100% { transform: translate(0,0) scale(1); }
-  33%     { transform: translate(6vw,4vh) scale(1.12); }
-  66%     { transform: translate(-4vw,8vh) scale(.94); }
-}
-@keyframes blob-b {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50%     { transform: translate(-7vw,-5vh) scale(1.15); }
-}
-/* faint shimmer veil — a large soft disc so no square edges show while spinning */
-.romance-bg__veil {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 200vmax; height: 200vmax;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: conic-gradient(from 0deg,
-    transparent 0deg, rgba(255,255,255,.5) 70deg,
-    transparent 150deg, rgba(216,165,147,.12) 240deg, transparent 320deg);
-  -webkit-mask: radial-gradient(circle, #000 55%, transparent 72%);
-  mask: radial-gradient(circle, #000 55%, transparent 72%);
-  animation: veil-spin 40s linear infinite;
-  opacity: .45;
-}
-@keyframes veil-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 /* ============================================================
    Blush petal field (drifts over the whole page)
    ============================================================ */
 .petal-field {
   position: fixed; left: 0; right: 0; top: -160px; bottom: -160px;
-  z-index: -1; overflow: hidden; pointer-events: none; will-change: transform;
+  z-index: -1; overflow: hidden; pointer-events: none;
 }
 .petal-pink {
   position: absolute; top: -8%;
-  // Responsive: base px grows with the viewport (px + vw is a valid calc).
   width: calc(var(--w, 14px) + 0.7vw);
   height: calc(var(--h, 12px) + 0.7vw);
   background: var(--c, rgba(216,165,147,.55));
   border-radius: 80% 10% 80% 10%;
   opacity: 0;
-  animation:
-    petal-drift var(--dur, 12s) linear var(--delay, 0s) infinite,
-    petal-sway calc(var(--dur, 12s) / 3) ease-in-out var(--delay, 0s) infinite alternate;
+  /* single transform-only animation (no margin/layout work) */
+  animation: petal-drift var(--dur, 12s) linear var(--delay, 0s) infinite;
 }
 @keyframes petal-drift {
-  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
   8%   { opacity: var(--o, .8); }
+  50%  { transform: translate3d(26px, 56vh, 0) rotate(220deg); }
   92%  { opacity: var(--o, .8); }
-  100% { transform: translateY(112vh) rotate(540deg); opacity: 0; }
-}
-@keyframes petal-sway {
-  from { margin-left: -22px; }
-  to   { margin-left: 22px; }
+  100% { transform: translate3d(-12px, 112vh, 0) rotate(480deg); opacity: 0; }
 }
 
 /* ============================================================
@@ -372,5 +334,39 @@
   50%     { transform: scaleX(-1) rotate(2.5deg); }
 }
 
-/* NOTE: animations intentionally always-on (per request) — no reduced-motion
-   suppression, so the site animates regardless of the OS "reduce motion" setting. */
+/* ============================================================
+   Performance tiers (class set on <html> by PerformanceService)
+   ------------------------------------------------------------
+   perf-high   → everything on (default styles already cover this)
+   perf-medium → drop the most expensive GPU effects, keep core motion
+   perf-low / perf-reduced → static experience, no continuous animation
+   ============================================================ */
+
+/* MEDIUM + LOW: kill backdrop-filter (most expensive scroll cost) everywhere. */
+.perf-medium [class*="backdrop-blur"],
+.perf-low [class*="backdrop-blur"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* MEDIUM: tame the soft blobs (smaller blur = far cheaper compositing). */
+.perf-medium .romance-bg__blob { filter: blur(28px); opacity: .32; }
+
+/* LOW: drop continuous & decorative animations entirely. */
+.perf-low {
+  .romance-bg__blob { display: none; }                 /* static gradient only   */
+  .animate-ken-burns { animation: none !important; }   /* no slow image zoom     */
+  .floral-deco { animation: none !important; }         /* no swaying corner art  */
+  .gold-shimmer,                                        /* no looping text sheen  */
+  .anim-float,
+  .marquee__track { animation: none !important; }
+  /* neutralise heavy shadows so paint stays cheap on weak GPUs */
+  .shadow-card, .shadow-lift, .shadow-glow-gold { box-shadow: var(--tw-shadow, 0 10px 30px -18px rgba(60,47,22,.35)) !important; }
+}
+
+/* LOW: make scroll-reveal instant instead of transitioned. */
+.perf-low [style*="will-change"] { will-change: auto !important; }
+
+/* NOTE: we intentionally do NOT add a global prefers-reduced-motion kill-switch.
+   Per the site's design the decorative motion stays on; adaptation is driven by
+   the measured FPS tier (perf-low / perf-medium / perf-high) instead. */

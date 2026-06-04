@@ -21,9 +21,17 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str = "ChangeMeNow!2026"
 
     CORS_ORIGINS: str = "http://localhost:4200"
+    # Comma-separated Host header allow-list for production (TrustedHostMiddleware).
+    # Empty = allow any (fine behind a trusted reverse proxy in dev).
+    ALLOWED_HOSTS: str = ""
 
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_MB: int = 15
+    # Hard cap on request body size (bytes) to blunt memory-exhaustion attacks.
+    MAX_REQUEST_BYTES: int = 1_000_000  # 1 MB for JSON APIs (uploads handled separately)
+
+    # Expose interactive API docs only when explicitly enabled (off in prod).
+    ENABLE_DOCS: bool = False
 
     # --- Cloudflare R2 (S3-compatible) gallery source ---
     # When all of these are set, the public gallery is served from the R2
@@ -41,6 +49,14 @@ class Settings(BaseSettings):
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
 
     @property
+    def allowed_hosts_list(self) -> List[str]:
+        return [h.strip() for h in self.ALLOWED_HOSTS.split(",") if h.strip()]
+
+    @property
+    def is_production(self) -> bool:
+        return self.APP_ENV.lower() in {"production", "prod"}
+
+    @property
     def r2_enabled(self) -> bool:
         return bool(
             self.R2_ACCOUNT_ID
@@ -51,9 +67,29 @@ class Settings(BaseSettings):
         )
 
 
+_WEAK_SECRETS = {"", "change-me", "changeme", "secret", "dev-secret-change-me"}
+
+
+def _validate(s: Settings) -> Settings:
+    """Refuse to boot a production server with insecure defaults."""
+    if s.is_production:
+        problems = []
+        if s.JWT_SECRET_KEY in _WEAK_SECRETS or len(s.JWT_SECRET_KEY) < 32:
+            problems.append("JWT_SECRET_KEY is weak/unset (use a long random value)")
+        if s.ADMIN_PASSWORD in {"", "ChangeMeNow!2026", "admin", "admin1234", "parolaputernica"}:
+            problems.append("ADMIN_PASSWORD is a known default — change it")
+        if not s.cors_origins_list or "*" in s.CORS_ORIGINS:
+            problems.append("CORS_ORIGINS must list explicit production origins (no '*')")
+        if problems:
+            raise RuntimeError(
+                "Insecure production configuration:\n  - " + "\n  - ".join(problems)
+            )
+    return s
+
+
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return _validate(Settings())
 
 
 settings = get_settings()

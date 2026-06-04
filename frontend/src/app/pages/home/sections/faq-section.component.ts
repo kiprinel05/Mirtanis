@@ -39,7 +39,7 @@ interface Faq {
 
           <!-- quick contact card -->
           <div
-            class="mt-8 rounded-3xl border border-cream-300/80 bg-cream-50/80 p-6 backdrop-blur-sm shadow-soft"
+            class="mt-8 rounded-3xl border border-cream-300/80 bg-cream-50/95 p-6 shadow-soft"
           >
             <p class="text-sm text-ink-600">Ai o întrebare specifică?</p>
             <a
@@ -62,7 +62,7 @@ interface Faq {
         <div class="space-y-3" appReveal="up" [revealStagger]="70">
           @for (f of faqs; track f.q; let i = $index) {
             <div
-              class="faq-item overflow-hidden rounded-2xl border bg-cream-50/75 backdrop-blur-sm transition-all duration-300"
+              class="faq-item overflow-hidden rounded-2xl border bg-cream-50/95 transition-all duration-300"
               [class.border-gold-300]="opened() === i"
               [class.border-cream-300]="opened() !== i"
               [class.shadow-soft]="opened() === i"

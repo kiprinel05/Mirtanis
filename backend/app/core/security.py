@@ -6,6 +6,10 @@ from app.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# A pre-computed bcrypt hash used to keep login timing constant when the user
+# does not exist, defeating account-enumeration via response timing.
+_DUMMY_HASH = pwd_context.hash("timing-attack-dummy-value")
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -13,6 +17,14 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
+
+
+def dummy_verify() -> None:
+    """Burn the same CPU as a real verify so missing-user logins aren't faster."""
+    try:
+        pwd_context.verify("timing-attack-dummy-value", _DUMMY_HASH)
+    except Exception:
+        pass
 
 
 def create_access_token(subject: str, expires_minutes: Optional[int] = None) -> str:

@@ -1,12 +1,14 @@
-import { AfterViewInit, Component, ElementRef, effect, inject, viewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, effect, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppStateService } from '../../../core/services/app-state.service';
+import { PerformanceService } from '../../../core/services/performance.service';
 import { ParallaxDirective } from '../../../shared/directives/parallax.directive';
 
 @Component({
   selector: 'app-hero-section',
   standalone: true,
   imports: [RouterLink, ParallaxDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
       <!-- Background image with slow ken-burns + scroll parallax -->

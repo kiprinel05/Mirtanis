@@ -29,7 +29,7 @@ import { ParallaxDirective } from '../../../shared/directives/parallax.directive
              appReveal="up" [revealStagger]="120" [revealDelay]="200">
           @for (s of stats; track s.label) {
             <div class="flex flex-col items-center">
-              <span class="mb-3 grid h-12 w-12 place-items-center rounded-full border border-gold-200/40 bg-cream-50/10 text-gold-200 backdrop-blur-sm">
+              <span class="mb-3 grid h-12 w-12 place-items-center rounded-full border border-gold-200/40 bg-cream-50/10 text-gold-200">
                 <span class="mi text-[24px]">{{ s.icon }}</span>
               </span>
               <p class="font-display text-4xl text-gold-200 sm:text-5xl"

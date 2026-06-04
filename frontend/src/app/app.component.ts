@@ -1,6 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { PerformanceService } from './core/services/performance.service';
 import { NavbarComponent } from './shared/components/navbar.component';
 import { FooterComponent } from './shared/components/footer.component';
 import { LoaderComponent } from './shared/components/loader.component';
@@ -23,6 +24,7 @@ import { environment } from '../environments/environment';
     SmoothScrollDirective,
     ComingSoonComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (comingSoon) {
       <!-- Maintenance gate shown while the site is being prepared on the server -->
@@ -45,6 +47,8 @@ import { environment } from '../environments/environment';
 })
 export class AppComponent {
   private readonly router = inject(Router);
+  // Instantiating the service kicks off the FPS benchmark + tier class on <html>.
+  private readonly perf = inject(PerformanceService);
   readonly comingSoon = environment.comingSoon;
   readonly chromeless = signal(this.isAdmin(this.router.url));
 

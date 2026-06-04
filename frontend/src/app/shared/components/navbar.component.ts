@@ -1,4 +1,4 @@
-import { Component, HostListener, signal } from "@angular/core";
+import { AfterViewInit, Component, NgZone, OnDestroy, inject, signal } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 
 @Component({
@@ -299,7 +299,9 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
     `,
   ],
 })
-export class NavbarComponent {
+export class NavbarComponent implements AfterViewInit, OnDestroy {
+  private readonly zone = inject(NgZone);
+
   readonly links = [
     { path: "/", label: "Acasă" },
     { path: "/locatii", label: "Locații" },
@@ -312,12 +314,39 @@ export class NavbarComponent {
   readonly open = signal(false);
   readonly progress = signal(0);
 
-  @HostListener("window:scroll")
-  onScroll(): void {
-    const y = window.scrollY;
-    this.scrolled.set(y > 24);
-    const h = document.documentElement.scrollHeight - window.innerHeight;
-    this.progress.set(h > 0 ? Math.min(100, (y / h) * 100) : 0);
+  private ticking = false;
+  private wasScrolled = false;
+  private lastProgress = 0;
+
+  private readonly onScroll = () => {
+    if (this.ticking) return;
+    this.ticking = true;
+    requestAnimationFrame(() => {
+      const y = window.scrollY;
+      const isScrolled = y > 24;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const prog = h > 0 ? Math.min(100, Math.round((y / h) * 100)) : 0;
+      // Only re-enter Angular (trigger CD) when a value actually changed.
+      if (isScrolled !== this.wasScrolled || prog !== this.lastProgress) {
+        this.wasScrolled = isScrolled;
+        this.lastProgress = prog;
+        this.zone.run(() => {
+          this.scrolled.set(isScrolled);
+          this.progress.set(prog);
+        });
+      }
+      this.ticking = false;
+    });
+  };
+
+  ngAfterViewInit(): void {
+    this.zone.runOutsideAngular(() => {
+      window.addEventListener("scroll", this.onScroll, { passive: true });
+    });
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener("scroll", this.onScroll);
   }
 
   toggle(): void {

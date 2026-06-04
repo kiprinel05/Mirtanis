@@ -28,7 +28,7 @@ interface Review { quote: string; opener: string; name: string; meta: string; in
           <p class="eyebrow both">Recenzii reale</p>
           <h2 class="mt-4 font-display text-4xl text-ink-900 sm:text-5xl">Ce spun <span class="gold-text">invitații noștri</span></h2>
 
-          <div class="mt-7 inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-full border border-cream-300 bg-cream-50/80 px-6 py-3 shadow-soft backdrop-blur-sm">
+          <div class="mt-7 inline-flex flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-full border border-cream-300 bg-cream-50/95 px-6 py-3 shadow-soft">
             <span class="flex items-center gap-0.5 text-gold-500" aria-label="5 din 5 stele">
               @for (s of stars; track $index) { <span class="mi fill text-[18px]">star</span> }
             </span>
@@ -84,7 +84,7 @@ interface Review { quote: string; opener: string; name: string; meta: string; in
           <!-- Side list of shorter reviews -->
           <div class="grid gap-4" appReveal="right" [revealStagger]="90">
             @for (r of shorts; track r.name) {
-              <div class="group relative overflow-hidden rounded-3xl border border-cream-300 bg-cream-50/80 p-6 shadow-soft backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card">
+              <div class="group relative overflow-hidden rounded-3xl border border-cream-300 bg-cream-50/95 p-6 shadow-soft transition-all duration-500 hover:-translate-y-1 hover:border-gold-300 hover:shadow-card">
                 <span class="pointer-events-none absolute -right-2 -top-3 font-display text-6xl text-gold-100 transition-colors group-hover:text-gold-200">”</span>
                 <div class="relative flex items-center gap-0.5 text-gold-500">
                   @for (s of stars; track $index) { <span class="mi fill text-[15px]">star</span> }

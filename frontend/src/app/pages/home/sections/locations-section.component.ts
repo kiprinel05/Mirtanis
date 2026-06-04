@@ -48,7 +48,7 @@ import { FloralCornerComponent } from '../../../shared/components/floral-corner.
 
               <ul class="mt-5 flex flex-wrap gap-2">
                 @for (f of tent.features; track f) {
-                  <li class="inline-flex items-center gap-1.5 rounded-full bg-cream-50/15 px-3 py-1.5 text-xs text-cream-50 backdrop-blur-sm">
+                  <li class="inline-flex items-center gap-1.5 rounded-full bg-cream-50/15 px-3 py-1.5 text-xs text-cream-50">
                     <span class="mi text-[15px] text-gold-200">{{ f.icon }}</span> {{ f.label }}
                   </li>
                 }
@@ -60,7 +60,7 @@ import { FloralCornerComponent } from '../../../shared/components/floral-corner.
 
           <!-- SECONDARY CARD: the hall (alternative) -->
           <article appReveal="right" [revealDelay]="120"
-                   class="group hover-lift relative overflow-hidden rounded-4xl border border-cream-300/70 bg-cream-50/70 backdrop-blur-sm shadow-soft">
+                   class="group hover-lift relative overflow-hidden rounded-4xl border border-cream-300/70 bg-cream-50/95 shadow-soft">
             <div class="aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-1/2">
               <img [src]="hall.img" [alt]="hall.title" class="h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105" loading="lazy" />
             </div>

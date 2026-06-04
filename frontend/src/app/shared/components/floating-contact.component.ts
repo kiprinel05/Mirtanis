@@ -1,4 +1,4 @@
-import { Component, HostListener, signal } from "@angular/core";
+import { AfterViewInit, Component, NgZone, OnDestroy, inject, signal } from "@angular/core";
 
 /**
  * Floating WhatsApp + Call icon buttons, fixed bottom-right.
@@ -119,16 +119,36 @@ import { Component, HostListener, signal } from "@angular/core";
     `,
   ],
 })
-export class FloatingContactComponent {
-  // TODO: replace with the real number (international format for WhatsApp)
+export class FloatingContactComponent implements AfterViewInit, OnDestroy {
+  private readonly zone = inject(NgZone);
+
   readonly waLink = "https://wa.me/40767690552";
   readonly telLink = "tel:+40767690552";
 
   readonly visible = signal(false);
+  private ticking = false;
+  private wasVisible = false;
 
-  @HostListener("window:scroll")
-  onScroll(): void {
-    // Show only after scrolling past ~70% of the first viewport (the hero).
-    this.visible.set(window.scrollY > window.innerHeight * 0.7);
+  private readonly onScroll = () => {
+    if (this.ticking) return;
+    this.ticking = true;
+    requestAnimationFrame(() => {
+      const v = window.scrollY > window.innerHeight * 0.7;
+      if (v !== this.wasVisible) {
+        this.wasVisible = v;
+        this.zone.run(() => this.visible.set(v));
+      }
+      this.ticking = false;
+    });
+  };
+
+  ngAfterViewInit(): void {
+    this.zone.runOutsideAngular(() => {
+      window.addEventListener("scroll", this.onScroll, { passive: true });
+    });
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener("scroll", this.onScroll);
   }
 }

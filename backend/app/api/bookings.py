@@ -1,9 +1,10 @@
 from datetime import date
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_admin
+from app.core.ratelimit import limiter
 from app.database import get_db
 from app.models.booking import Booking, BookingStatus
 from app.models.availability import AvailabilityDay, AvailabilityStatus
@@ -13,7 +14,8 @@ router = APIRouter(prefix="/bookings", tags=["bookings"])
 
 
 @router.post("", response_model=BookingOut, status_code=status.HTTP_201_CREATED)
-def create_booking(payload: BookingCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute;20/day")
+def create_booking(request: Request, payload: BookingCreate, db: Session = Depends(get_db)):
     if payload.event_date < date.today():
         raise HTTPException(status_code=400, detail="Data trebuie să fie în viitor")
 

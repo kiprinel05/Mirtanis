@@ -1,4 +1,5 @@
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, inject } from '@angular/core';
+import { PerformanceService } from '../../core/services/performance.service';
 
 type RevealMode = '' | 'up' | 'down' | 'left' | 'right' | 'scale' | 'blur';
 
@@ -20,6 +21,7 @@ type RevealMode = '' | 'up' | 'down' | 'left' | 'right' | 'scale' | 'blur';
 })
 export class RevealDirective implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef<HTMLElement>);
+  private readonly perf = inject(PerformanceService);
   private observer?: IntersectionObserver;
   private rafId = 0;
 
@@ -35,15 +37,20 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
       ? (Array.from(host.children) as HTMLElement[])
       : [host];
 
+    // Only skip the entrance on genuinely low-end devices (measured FPS).
+    // prefers-reduced-motion is intentionally NOT a kill switch here.
+    if (this.perf.isLow()) {
+      return;
+    }
+
     targets.forEach((node, i) => {
       node.style.opacity = '0';
       node.style.transform = this.initialTransform();
-      if (this.appReveal === 'blur') node.style.filter = 'blur(10px)';
       const delay = this.revealDelay + i * this.revealStagger;
+      // Only opacity + transform — both GPU-composited, no blur/filter.
       node.style.transition =
         `opacity ${this.revealDuration}ms cubic-bezier(0.22,1,0.36,1) ${delay}ms,` +
-        `transform ${this.revealDuration}ms cubic-bezier(0.22,1,0.36,1) ${delay}ms,` +
-        `filter ${this.revealDuration}ms ease ${delay}ms`;
+        `transform ${this.revealDuration}ms cubic-bezier(0.22,1,0.36,1) ${delay}ms`;
       node.style.willChange = 'opacity, transform';
     });
 
@@ -85,7 +92,6 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
         for (const node of targets) {
           node.style.opacity = '1';
           node.style.transform = 'translate3d(0,0,0) scale(1)';
-          node.style.filter = 'none';
         }
         // Drop will-change once the entrance is done so it doesn't pin layers.
         const total = this.revealDuration + this.revealDelay + targets.length * this.revealStagger + 80;
