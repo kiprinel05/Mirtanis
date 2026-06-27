@@ -57,13 +57,6 @@ import { RouterLink } from "@angular/router";
                 </li>
                 <li>
                   <a
-                    routerLink="/rezervari"
-                    class="transition-colors hover:text-gold-200"
-                    >Rezervări</a
-                  >
-                </li>
-                <li>
-                  <a
                     routerLink="/contact"
                     class="transition-colors hover:text-gold-200"
                     >Contact</a
@@ -104,7 +97,7 @@ import { RouterLink } from "@angular/router";
             <p class="mb-4 text-sm text-cream-100/70">
               Verifică disponibilitatea datei tale în câteva secunde.
             </p>
-            <a routerLink="/rezervari" class="btn btn-gold w-full sm:w-auto"
+            <a routerLink="/contact" class="btn btn-gold w-full sm:w-auto"
               >Verifică data</a
             >
           </div>

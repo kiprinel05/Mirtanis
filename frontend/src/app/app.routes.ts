@@ -13,11 +13,6 @@ export const routes: Routes = [
     title: 'Galerie — Mirtanis Events'
   },
   {
-    path: 'rezervari',
-    loadComponent: () => import('./pages/booking/booking.component').then((m) => m.BookingComponent),
-    title: 'Verifică disponibilitatea — Mirtanis Events'
-  },
-  {
     path: 'contact',
     loadComponent: () => import('./pages/contact/contact.component').then((m) => m.ContactComponent),
     title: 'Contact — Mirtanis Events'

@@ -25,10 +25,7 @@ import { ParallaxDirective } from '../../../shared/directives/parallax.directive
               Spune-ne data și detaliile evenimentului tău, iar noi îți pregătim o ofertă personalizată.
             </p>
             <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <a routerLink="/rezervari" class="btn btn-gold w-full sm:w-auto">Verifică disponibilitatea</a>
-              <a routerLink="/contact" class="btn btn-outline w-full !border-cream-100/60 !text-cream-50 hover:!bg-cream-50/10 sm:w-auto">
-                Contactează-ne
-              </a>
+              <a routerLink="/contact" class="btn btn-gold w-full sm:w-auto">Contactează-ne</a>
             </div>
           </div>
         </div>

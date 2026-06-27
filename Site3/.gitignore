@@ -1,0 +1,12 @@
+/node_modules
+/dist
+/out-tsc
+/tmp
+.angular/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+.env
+.env.local

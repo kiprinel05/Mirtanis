@@ -33,7 +33,9 @@ services:
       - mirtanis_net
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: mirtanis_web
     restart: unless-stopped
     depends_on:

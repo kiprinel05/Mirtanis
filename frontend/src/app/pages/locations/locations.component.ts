@@ -53,7 +53,7 @@ import { FloralCornerComponent } from '../../shared/components/floral-corner.com
                 </li>
               }
             </ul>
-            <a routerLink="/rezervari" class="btn btn-gold mt-10">Verifică disponibilitatea</a>
+            <a routerLink="/contact" class="btn btn-gold mt-10">Verifică disponibilitatea</a>
           </div>
         </div>
       </div>
@@ -102,7 +102,6 @@ import { FloralCornerComponent } from '../../shared/components/floral-corner.com
             <p class="max-w-md text-cream-100/85">Te așteptăm pe malul lacului să descoperi locul unde povestea ta prinde viață.</p>
             <div class="mt-4 flex flex-col gap-3 sm:flex-row">
               <a routerLink="/contact" class="btn btn-gold">Contactează-ne</a>
-              <a routerLink="/rezervari" class="btn btn-outline !border-cream-100/60 !text-cream-50 hover:!bg-cream-50/10">Verifică disponibilitatea</a>
             </div>
           </div>
         </div>

@@ -46,7 +46,7 @@ import { ParallaxDirective } from '../../../shared/directives/parallax.directive
           cu lumină caldă, apă liniștită și amintiri care rămân.
         </p>
         <div class="hero-line mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <a routerLink="/rezervari" class="btn btn-gold w-full sm:w-auto">Verifică disponibilitatea</a>
+          <a routerLink="/contact" class="btn btn-gold w-full sm:w-auto">Verifică disponibilitatea</a>
           <a routerLink="/galerie" class="btn btn-hero-ghost w-full sm:w-auto">Descoperă galeria</a>
         </div>
       </div>
